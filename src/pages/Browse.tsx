@@ -13,7 +13,7 @@ import { useSearchParams } from 'react-router-dom';
 const Browse = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || '');
-  const [priceRange, setPriceRange] = useState(searchParams.get('price') || '');
+  const [priceRange, setPriceRange] = useState(searchParams.get('price') || 'all');
   const [utilities, setUtilities] = useState<string[]>([]);
   const [nearbyServices, setNearbyServices] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('newest');
@@ -21,12 +21,11 @@ const Browse = () => {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Sample properties data
+  // Sample properties data with 30 properties
   const allProperties = [
     {
       id: '1',
       title: 'Nyumba ya Kisasa Mikocheni',
-      description: 'Nyumba nzuri ya vyumba 3 na jiko la kisasa. Ina bustani ndogo na nafasi ya gari. Mazingira mazuri na usalama wa juu.',
       price: 800000,
       location: 'Mikocheni, Dar es Salaam',
       images: ['https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop'],
@@ -37,7 +36,6 @@ const Browse = () => {
     {
       id: '2',
       title: 'Apartmenti ya Ufukweni',
-      description: 'Chumba kimoja na jiko. Karibu na barabara kuu na maktaba ya umma. Bei nafuu kwa wanafunzi.',
       price: 400000,
       location: 'Mwananyamala, Dar es Salaam',
       images: ['https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=300&fit=crop'],
@@ -48,7 +46,6 @@ const Browse = () => {
     {
       id: '3',
       title: 'Nyumba ya Familia Arusha',
-      description: 'Nyumba kubwa ya vyumba 4 na bustani. Mazingira mazuri na hewa safi. Inafaa kwa familia kubwa.',
       price: 1200000,
       location: 'Njiro, Arusha',
       images: ['https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400&h=300&fit=crop'],
@@ -59,7 +56,6 @@ const Browse = () => {
     {
       id: '4',
       title: 'Studio ya Mtaa wa Kijitonyama',
-      description: 'Chumba kimoja chenye kila kitu. Karibu na stendi za daladala na maduka.',
       price: 350000,
       location: 'Kijitonyama, Dar es Salaam',
       images: ['https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop'],
@@ -70,10 +66,9 @@ const Browse = () => {
     {
       id: '5',
       title: 'Nyumba ya Kielembe',
-      description: 'Vyumba 2 na sebule kubwa. Ina bomba la maji na umeme wa kudumu.',
       price: 600000,
       location: 'Sinza, Dar es Salaam',
-      images: ['https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop'],
+      images: ['https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=400&h=300&fit=crop'],
       utilities: { electricity: true, water: true },
       nearbyServices: ['school', 'hospital', 'market'],
       landlord: { name: 'Bwana Peter', phone: '+255654321987', email: 'peter@example.com' }
@@ -81,13 +76,252 @@ const Browse = () => {
     {
       id: '6',
       title: 'Chumba cha Bedsitter Mwanza',
-      description: 'Bedsitter lenye jiko na choo. Karibu na ziwa Victoria na mazingira mazuri.',
       price: 450000,
       location: 'Ilemela, Mwanza',
-      images: ['https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=300&fit=crop'],
+      images: ['https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=300&fit=crop'],
       utilities: { electricity: false, water: true },
       nearbyServices: ['market', 'hospital'],
       landlord: { name: 'Dada Susan', phone: '+255712987654', email: 'susan@example.com' }
+    },
+    {
+      id: '7',
+      title: 'Villa ya Msimbazi',
+      price: 1500000,
+      location: 'Msimbazi, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'Dr. Ahmed', phone: '+255713456789', email: 'ahmed@example.com' }
+    },
+    {
+      id: '8',
+      title: 'Nyumba ya Kifahari Mbezi',
+      price: 950000,
+      location: 'Mbezi Beach, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'market'],
+      landlord: { name: 'Eng. Patricia', phone: '+255765432198', email: 'patricia@example.com' }
+    },
+    {
+      id: '9',
+      title: 'Fleti ya Kiongozi',
+      price: 700000,
+      location: 'Kinondoni, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['hospital', 'market'],
+      landlord: { name: 'Mheshimiwa John', phone: '+255756789123', email: 'john.m@example.com' }
+    },
+    {
+      id: '10',
+      title: 'Nyumba ya Kijiji Dodoma',
+      price: 500000,
+      location: 'Kigoma, Dodoma',
+      images: ['https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: false },
+      nearbyServices: ['school'],
+      landlord: { name: 'Mzee Robert', phone: '+255698765432', email: 'robert@example.com' }
+    },
+    {
+      id: '11',
+      title: 'Penthouse ya Mlimani',
+      price: 2200000,
+      location: 'Mlimani City, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'CEO Michael', phone: '+255787654321', email: 'michael@example.com' }
+    },
+    {
+      id: '12',
+      title: 'Ghorofa ya Kimodern',
+      price: 850000,
+      location: 'Upanga, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['hospital', 'market'],
+      landlord: { name: 'Dkt. Sarah', phone: '+255654987321', email: 'sarah@example.com' }
+    },
+    {
+      id: '13',
+      title: 'Nyumba ya Familia Moshi',
+      price: 680000,
+      location: 'Moshi Urban, Kilimanjaro',
+      images: ['https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital'],
+      landlord: { name: 'Mama Elizabeth', phone: '+255743210987', email: 'elizabeth@example.com' }
+    },
+    {
+      id: '14',
+      title: 'Bungalow la Bahari',
+      price: 1800000,
+      location: 'Msimbazi Bay, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['market'],
+      landlord: { name: 'Captain James', phone: '+255712345987', email: 'james@example.com' }
+    },
+    {
+      id: '15',
+      title: 'Nyumba ya Kibinafsi Tabata',
+      price: 520000,
+      location: 'Tabata, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'market'],
+      landlord: { name: 'Ndugu Joseph', phone: '+255776543210', email: 'joseph@example.com' }
+    },
+    {
+      id: '16',
+      title: 'Maisonette ya Magomeni',
+      price: 1100000,
+      location: 'Magomeni, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'Prof. Daniel', phone: '+255798765432', email: 'daniel@example.com' }
+    },
+    {
+      id: '17',
+      title: 'Flat ya Kisasa Ubungo',
+      price: 750000,
+      location: 'Ubungo, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['hospital', 'market'],
+      landlord: { name: 'Arch. Maria', phone: '+255723456789', email: 'maria@example.com' }
+    },
+    {
+      id: '18',
+      title: 'Nyumba ya Bustani Tanga',
+      price: 890000,
+      location: 'Tanga Urban, Tanga',
+      images: ['https://images.unsplash.com/photo-1502005229762-cf1b2da2db52?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital'],
+      landlord: { name: 'Bi. Fatuma', phone: '+255687543210', email: 'fatuma@example.com' }
+    },
+    {
+      id: '19',
+      title: 'Duplex ya Kariakoo',
+      price: 650000,
+      location: 'Kariakoo, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: false },
+      nearbyServices: ['market'],
+      landlord: { name: 'Bwana Ali', phone: '+255654123789', email: 'ali@example.com' }
+    },
+    {
+      id: '20',
+      title: 'Townhouse ya Oysterbay',
+      price: 2800000,
+      location: 'Oysterbay, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600607687644-c7171b42498b?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'Hon. Grace', phone: '+255789123456', email: 'grace.h@example.com' }
+    },
+    {
+      id: '21',
+      title: 'Nyumba ya Uongozi Iringa',
+      price: 920000,
+      location: 'Iringa Urban, Iringa',
+      images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital'],
+      landlord: { name: 'Judge William', phone: '+255712987654', email: 'william@example.com' }
+    },
+    {
+      id: '22',
+      title: 'Condo ya Mikindani',
+      price: 580000,
+      location: 'Mikindani, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'market'],
+      landlord: { name: 'Mama Joyce', phone: '+255743567890', email: 'joyce@example.com' }
+    },
+    {
+      id: '23',
+      title: 'Villa ya Kijiji Morogoro',
+      price: 1350000,
+      location: 'Morogoro Urban, Morogoro',
+      images: ['https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'Prof. Hassan', phone: '+255765890123', email: 'hassan.p@example.com' }
+    },
+    {
+      id: '24',
+      title: 'Bedsitter ya Kimara',
+      price: 380000,
+      location: 'Kimara, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: false },
+      nearbyServices: ['market'],
+      landlord: { name: 'Kaka Juma', phone: '+255698234567', email: 'juma@example.com' }
+    },
+    {
+      id: '25',
+      title: 'Apartment ya VIP Masaki',
+      price: 3200000,
+      location: 'Masaki, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'Ambassador John', phone: '+255787123456', email: 'john.amb@example.com' }
+    },
+    {
+      id: '26',
+      title: 'Nyumba ya Makazi Mbeya',
+      price: 720000,
+      location: 'Mbeya Urban, Mbeya',
+      images: ['https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital'],
+      landlord: { name: 'Dr. Joyce', phone: '+255756234789', email: 'joyce.dr@example.com' }
+    },
+    {
+      id: '27',
+      title: 'Flat ya Kisimani Mwanza',
+      price: 480000,
+      location: 'Kisimani, Mwanza',
+      images: ['https://images.unsplash.com/photo-1600566753151-384129cf4e3e?w=400&h=300&fit=crop'],
+      utilities: { electricity: false, water: true },
+      nearbyServices: ['market', 'hospital'],
+      landlord: { name: 'Fisherman Paul', phone: '+255689456123', email: 'paul@example.com' }
+    },
+    {
+      id: '28',
+      title: 'Executive House Arusha',
+      price: 1650000,
+      location: 'Arusha Urban, Arusha',
+      images: ['https://images.unsplash.com/photo-1600607687644-aac4c3eac7f4?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'CEO Margaret', phone: '+255723789456', email: 'margaret@example.com' }
+    },
+    {
+      id: '29',
+      title: 'Nyumba ya Familia Bukoba',
+      price: 620000,
+      location: 'Bukoba Urban, Kagera',
+      images: ['https://images.unsplash.com/photo-1600566752229-450c4ff7a2c6?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'market'],
+      landlord: { name: 'Mama Anna', phone: '+255654789123', email: 'anna@example.com' }
+    },
+    {
+      id: '30',
+      title: 'Loft ya Kisasa Songea',
+      price: 550000,
+      location: 'Songea Urban, Ruvuma',
+      images: ['https://images.unsplash.com/photo-1600566753376-12c8ab7fb75b?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: false },
+      nearbyServices: ['school', 'hospital'],
+      landlord: { name: 'Teacher Moses', phone: '+255667890234', email: 'moses@example.com' }
     }
   ];
 
@@ -97,7 +331,7 @@ const Browse = () => {
       return false;
     }
 
-    if (priceRange) {
+    if (priceRange && priceRange !== 'all') {
       const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
       const minPrice = parseInt(min);
       const maxPrice = max ? parseInt(max) : Infinity;
@@ -145,7 +379,7 @@ const Browse = () => {
 
   const clearAllFilters = () => {
     setSearchQuery('');
-    setPriceRange('');
+    setPriceRange('all');
     setUtilities([]);
     setNearbyServices([]);
     setSortBy('newest');
@@ -349,7 +583,7 @@ const Browse = () => {
                 <Badge variant="secondary" className="px-3 py-1">
                   TZS {priceRange}
                   <button
-                    onClick={() => setPriceRange('')}
+                    onClick={() => setPriceRange('all')}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
