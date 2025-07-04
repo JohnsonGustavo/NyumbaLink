@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import PropertyCard from '@/components/PropertyCard';
+import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -416,6 +416,8 @@ const Browse = () => {
           </div>
         )}
       </div>
+      
+      <Footer />
     </div>
   );
 };
