@@ -189,7 +189,7 @@ const Browse = () => {
                       <SelectValue placeholder="Bei (TZS)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Bei yoyote</SelectItem>
+                      <SelectItem value="all">Bei yoyote</SelectItem>
                       <SelectItem value="0-500000">Chini ya 500K</SelectItem>
                       <SelectItem value="500000-1000000">500K - 1M</SelectItem>
                       <SelectItem value="1000000-2000000">1M - 2M</SelectItem>
@@ -331,7 +331,7 @@ const Browse = () => {
         </div>
 
         {/* Active Filters */}
-        {(searchQuery || priceRange || utilities.length > 0 || nearbyServices.length > 0) && (
+        {(searchQuery || (priceRange && priceRange !== 'all') || utilities.length > 0 || nearbyServices.length > 0) && (
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
               {searchQuery && (
@@ -345,7 +345,7 @@ const Browse = () => {
                   </button>
                 </Badge>
               )}
-              {priceRange && (
+              {priceRange && priceRange !== 'all' && (
                 <Badge variant="secondary" className="px-3 py-1">
                   TZS {priceRange}
                   <button
