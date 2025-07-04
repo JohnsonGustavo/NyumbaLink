@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, MapPin, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Filter, MapPin, SlidersHorizontal, X, Grid3X3, List } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
 const Browse = () => {
@@ -19,6 +19,7 @@ const Browse = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Sample properties data
   const allProperties = [
@@ -92,12 +93,10 @@ const Browse = () => {
 
   // Filter properties based on search criteria
   const filteredProperties = allProperties.filter(property => {
-    // Location filter
     if (searchQuery && !property.location.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
 
-    // Price range filter
     if (priceRange) {
       const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
       const minPrice = parseInt(min);
@@ -108,13 +107,11 @@ const Browse = () => {
       }
     }
 
-    // Utilities filter
     if (utilities.length > 0) {
       if (utilities.includes('electricity') && !property.utilities.electricity) return false;
       if (utilities.includes('water') && !property.utilities.water) return false;
     }
 
-    // Nearby services filter
     if (nearbyServices.length > 0) {
       const hasAllServices = nearbyServices.every(service => 
         property.nearbyServices.includes(service)
@@ -155,260 +152,267 @@ const Browse = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <Navigation />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Tazama Nyumba za Kupanga
-          </h1>
-          <p className="text-gray-600">
-            {sortedProperties.length} nyumba zinapatikana
-          </p>
-        </div>
+      {/* Hero Search Section */}
+      <div className="bg-gradient-to-r from-primary/5 to-serengeti-50 border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Pata Nyumba Yako ya Kupenda
+            </h1>
+            <p className="text-lg text-gray-600 mb-8">
+              Nyumba {sortedProperties.length} zinapatikana kwa ajili yako
+            </p>
+          </div>
 
-        {/* Search and filters */}
-        <div className="mb-8">
-          <Card>
+          {/* Main Search Bar */}
+          <Card className="shadow-lg border-0">
             <CardContent className="p-6">
-              {/* Main search row */}
-              <div className="flex flex-col lg:flex-row gap-4 mb-4">
+              <div className="flex flex-col lg:flex-row gap-4">
                 <div className="flex-1">
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                    <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <Input
-                      placeholder="Tafuta kwa jina la mji au eneo..."
+                      placeholder="Mji au eneo la kupenda..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
+                      className="pl-12 h-14 text-lg border-0 focus-visible:ring-2 focus-visible:ring-primary"
                     />
                   </div>
                 </div>
 
-                <Select value={priceRange} onValueChange={setPriceRange}>
-                  <SelectTrigger className="w-full lg:w-48">
-                    <SelectValue placeholder="Bei (TZS)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Bei yoyote</SelectItem>
-                    <SelectItem value="0-500000">Chini ya 500,000</SelectItem>
-                    <SelectItem value="500000-1000000">500,000 - 1,000,000</SelectItem>
-                    <SelectItem value="1000000-2000000">1,000,000 - 2,000,000</SelectItem>
-                    <SelectItem value="2000000-5000000">2,000,000 - 5,000,000</SelectItem>
-                    <SelectItem value="5000000+">Zaidi ya 5,000,000</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex gap-4">
+                  <Select value={priceRange} onValueChange={setPriceRange}>
+                    <SelectTrigger className="w-48 h-14 border-0">
+                      <SelectValue placeholder="Bei (TZS)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Bei yoyote</SelectItem>
+                      <SelectItem value="0-500000">Chini ya 500K</SelectItem>
+                      <SelectItem value="500000-1000000">500K - 1M</SelectItem>
+                      <SelectItem value="1000000-2000000">1M - 2M</SelectItem>
+                      <SelectItem value="2000000+">Zaidi ya 2M</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="w-full lg:w-48">
-                    <SelectValue placeholder="Panga kwa" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Mpya zaidi</SelectItem>
-                    <SelectItem value="price-low">Bei ya chini kwanza</SelectItem>
-                    <SelectItem value="price-high">Bei ya juu kwanza</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="h-14 px-6 border-2"
+                  >
+                    <SlidersHorizontal className="h-5 w-5 mr-2" />
+                    Filters
+                  </Button>
 
-                <Button
-                  variant="outline"
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="lg:w-auto"
-                >
-                  <SlidersHorizontal className="h-4 w-4 mr-2" />
-                  Filters
-                </Button>
+                  <Button className="h-14 px-8 bg-primary hover:bg-primary/90">
+                    <Search className="h-5 w-5 mr-2" />
+                    Tafuta
+                  </Button>
+                </div>
               </div>
 
-              {/* Advanced filters */}
+              {/* Advanced Filters */}
               {showFilters && (
-                <div className="border-t pt-4 space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {/* Utilities */}
+                <div className="border-t mt-6 pt-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Huduma za Msingi
-                      </label>
-                      <div className="space-y-2">
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={utilities.includes('electricity')}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setUtilities([...utilities, 'electricity']);
-                              } else {
-                                setUtilities(utilities.filter(u => u !== 'electricity'));
-                              }
-                            }}
-                            className="mr-2"
-                          />
-                          Umeme
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={utilities.includes('water')}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setUtilities([...utilities, 'water']);
-                              } else {
-                                setUtilities(utilities.filter(u => u !== 'water'));
-                              }
-                            }}
-                            className="mr-2"
-                          />
-                          Maji
-                        </label>
+                      <h4 className="font-semibold text-gray-900 mb-3">Huduma za Msingi</h4>
+                      <div className="space-y-3">
+                        {['electricity', 'water'].map((utility) => (
+                          <label key={utility} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={utilities.includes(utility)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setUtilities([...utilities, utility]);
+                                } else {
+                                  setUtilities(utilities.filter(u => u !== utility));
+                                }
+                              }}
+                              className="mr-3 w-4 h-4 text-primary"
+                            />
+                            <span className="text-gray-700">
+                              {utility === 'electricity' ? 'Umeme' : 'Maji'}
+                            </span>
+                          </label>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Nearby services */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Huduma za Karibu
-                      </label>
-                      <div className="space-y-2">
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={nearbyServices.includes('school')}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setNearbyServices([...nearbyServices, 'school']);
-                              } else {
-                                setNearbyServices(nearbyServices.filter(s => s !== 'school'));
-                              }
-                            }}
-                            className="mr-2"
-                          />
-                          Shule
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={nearbyServices.includes('hospital')}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setNearbyServices([...nearbyServices, 'hospital']);
-                              } else {
-                                setNearbyServices(nearbyServices.filter(s => s !== 'hospital'));
-                              }
-                            }}
-                            className="mr-2"
-                          />
-                          Hospitali
-                        </label>
-                        <label className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={nearbyServices.includes('market')}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setNearbyServices([...nearbyServices, 'market']);
-                              } else {
-                                setNearbyServices(nearbyServices.filter(s => s !== 'market'));
-                              }
-                            }}
-                            className="mr-2"
-                          />
-                          Soko
-                        </label>
+                      <h4 className="font-semibold text-gray-900 mb-3">Huduma za Karibu</h4>
+                      <div className="space-y-3">
+                        {['school', 'hospital', 'market'].map((service) => (
+                          <label key={service} className="flex items-center">
+                            <input
+                              type="checkbox"
+                              checked={nearbyServices.includes(service)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setNearbyServices([...nearbyServices, service]);
+                                } else {
+                                  setNearbyServices(nearbyServices.filter(s => s !== service));
+                                }
+                              }}
+                              className="mr-3 w-4 h-4 text-primary"
+                            />
+                            <span className="text-gray-700">
+                              {service === 'school' ? 'Shule' : service === 'hospital' ? 'Hospitali' : 'Soko'}
+                            </span>
+                          </label>
+                        ))}
                       </div>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Panga Kwa</h4>
+                      <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="newest">Mpya zaidi</SelectItem>
+                          <SelectItem value="price-low">Bei ya chini</SelectItem>
+                          <SelectItem value="price-high">Bei ya juu</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 
-                  {/* Clear filters */}
-                  <div className="flex justify-end">
-                    <Button variant="ghost" onClick={clearAllFilters}>
+                  <div className="flex justify-between items-center mt-6">
+                    <Button variant="ghost" onClick={clearAllFilters} className="text-gray-600">
                       <X className="h-4 w-4 mr-2" />
                       Futa Filters Zote
                     </Button>
                   </div>
                 </div>
               )}
-
-              {/* Active filters */}
-              {(searchQuery || priceRange || utilities.length > 0 || nearbyServices.length > 0) && (
-                <div className="border-t pt-4 mt-4">
-                  <div className="flex flex-wrap gap-2">
-                    {searchQuery && (
-                      <Badge variant="secondary">
-                        Mahali: {searchQuery}
-                        <button
-                          onClick={() => setSearchQuery('')}
-                          className="ml-2 text-xs"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    )}
-                    {priceRange && (
-                      <Badge variant="secondary">
-                        Bei: TZS {priceRange}
-                        <button
-                          onClick={() => setPriceRange('')}
-                          className="ml-2 text-xs"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    )}
-                    {utilities.map(utility => (
-                      <Badge key={utility} variant="secondary">
-                        {utility === 'electricity' ? 'Umeme' : 'Maji'}
-                        <button
-                          onClick={() => setUtilities(utilities.filter(u => u !== utility))}
-                          className="ml-2 text-xs"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    ))}
-                    {nearbyServices.map(service => (
-                      <Badge key={service} variant="secondary">
-                        {service === 'school' ? 'Shule' : service === 'hospital' ? 'Hospitali' : 'Soko'}
-                        <button
-                          onClick={() => setNearbyServices(nearbyServices.filter(s => s !== service))}
-                          className="ml-2 text-xs"
-                        >
-                          ×
-                        </button>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
+      </div>
 
-        {/* Properties grid */}
+      {/* Results Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Results Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900">
+              {sortedProperties.length} nyumba zinapatikana
+            </h2>
+            {searchQuery && (
+              <p className="text-gray-600 mt-1">katika "{searchQuery}"</p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex border rounded-lg">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('grid')}
+                className="rounded-r-none"
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="rounded-l-none"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Filters */}
+        {(searchQuery || priceRange || utilities.length > 0 || nearbyServices.length > 0) && (
+          <div className="mb-6">
+            <div className="flex flex-wrap gap-2">
+              {searchQuery && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  {searchQuery}
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="ml-2 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {priceRange && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  TZS {priceRange}
+                  <button
+                    onClick={() => setPriceRange('')}
+                    className="ml-2 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {utilities.map(utility => (
+                <Badge key={utility} variant="secondary" className="px-3 py-1">
+                  {utility === 'electricity' ? 'Umeme' : 'Maji'}
+                  <button
+                    onClick={() => setUtilities(utilities.filter(u => u !== utility))}
+                    className="ml-2 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+              {nearbyServices.map(service => (
+                <Badge key={service} variant="secondary" className="px-3 py-1">
+                  {service === 'school' ? 'Shule' : service === 'hospital' ? 'Hospitali' : 'Soko'}
+                  <button
+                    onClick={() => setNearbyServices(nearbyServices.filter(s => s !== service))}
+                    className="ml-2 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Properties Grid */}
         {sortedProperties.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className={`grid gap-6 ${
+            viewMode === 'grid' 
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
+              : 'grid-cols-1'
+          }`}>
             {sortedProperties.map((property) => (
               <PropertyCard
                 key={property.id}
                 {...property}
                 isFavorited={favoriteIds.includes(property.id)}
                 onToggleFavorite={handleToggleFavorite}
+                viewMode={viewMode}
               />
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <Search className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
-              Hakuna nyumba zilizopatikana
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Jaribu kubadilisha vigezo vya utafutaji au futa baadhi ya filters.
-            </p>
-            <Button onClick={clearAllFilters} variant="outline">
-              Futa Filters Zote
-            </Button>
+          <div className="text-center py-16">
+            <div className="max-w-md mx-auto">
+              <Search className="h-16 w-16 text-gray-300 mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                Hakuna nyumba zilizopatikana
+              </h3>
+              <p className="text-gray-600 mb-8">
+                Jaribu kubadilisha vigezo vya utafutaji au futa baadhi ya filters.
+              </p>
+              <Button onClick={clearAllFilters} size="lg">
+                Futa Filters Zote
+              </Button>
+            </div>
           </div>
         )}
       </div>
