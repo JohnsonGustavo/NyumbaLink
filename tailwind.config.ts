@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,43 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Tanzanian-inspired colors
+				safari: {
+					50: '#fdf8f3',
+					100: '#faeee1',
+					200: '#f4dac2',
+					300: '#ebc198',
+					400: '#dfa36c',
+					500: '#d7894a',
+					600: '#c9733f',
+					700: '#a85c36',
+					800: '#874a32',
+					900: '#6e3d2b'
+				},
+				kilimanjaro: {
+					50: '#f7f8f7',
+					100: '#e8ebe8',
+					200: '#d3d9d3',
+					300: '#b0bfb0',
+					400: '#849984',
+					500: '#627862',
+					600: '#4d614d',
+					700: '#404e40',
+					800: '#344034',
+					900: '#2b352b'
+				},
+				serengeti: {
+					50: '#fef7f0',
+					100: '#fdeadc',
+					200: '#f9d3b8',
+					300: '#f5b589',
+					400: '#ef8c58',
+					500: '#ea6d32',
+					600: '#db5928',
+					700: '#b64424',
+					800: '#913626',
+					900: '#752e22'
 				}
 			},
 			borderRadius: {
@@ -84,11 +122,21 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': { opacity: '0', transform: 'translateY(20px)' },
+					'100%': { opacity: '1', transform: 'translateY(0)' }
+				},
+				'slide-in': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.6s ease-out',
+				'slide-in': 'slide-in 0.5s ease-out'
 			}
 		}
 	},
