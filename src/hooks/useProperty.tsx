@@ -16,13 +16,11 @@ export const useProperty = (id: string | undefined) => {
         .from('properties')
         .select(`
           *,
-          profiles!fk_landlord_profile (
-            full_name,
-            phone
-          )
+          profiles!inner(full_name, phone)
         `)
         .eq('id', id)
-        .single();
+        .eq('profiles.user_id', 'landlord_id')
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching property:', error);
@@ -32,9 +30,7 @@ export const useProperty = (id: string | undefined) => {
       // Transform the data to match our Property type
       const transformedProperty = {
         ...data,
-        profiles: Array.isArray(data.profiles) && data.profiles.length > 0 
-          ? data.profiles[0] 
-          : undefined
+        profiles: data?.profiles?.[0] || data?.profiles
       } as Property;
 
       console.log('Property fetched successfully:', transformedProperty);
