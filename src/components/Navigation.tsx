@@ -22,7 +22,6 @@
  * NAVIGATION STRUCTURE / MUUNDO WA UONGOZAJI:
  * - Home: Landing page (Ukurasa wa kwanza)
  * - Browse: Property listings (Orodha ya nyumba)
- * - Favorites: Saved properties (Nyumba zilizookwa)
  * - Dashboard: Host/Landlord panel (Dashibodi ya mwenye nyumba)
  * - Authentication: Sign in/up (Kuingia/Kujisajili)
  * 
@@ -35,7 +34,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Search, User, Menu, X, Globe, Heart, Building2, LogOut } from 'lucide-react';
+import { Home, Search, User, Menu, X, Globe, Building2, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 /**
@@ -70,7 +69,6 @@ const Navigation = () => {
       home: 'Home',
       browse: 'Browse Properties',
       dashboard: 'Host Dashboard',
-      favorites: 'Favorites',
       signIn: 'Sign In',
       signUp: 'Sign Up',
       signOut: 'Sign Out',
@@ -81,7 +79,6 @@ const Navigation = () => {
       home: 'Nyumbani',
       browse: 'Tazama Nyumba',
       dashboard: 'Dashibodi ya Mwenye Nyumba',
-      favorites: 'Pendwa',
       signIn: 'Ingia',
       signUp: 'Jisajili',
       signOut: 'Toka',
@@ -132,19 +129,6 @@ const Navigation = () => {
                 }`}
               >
                 {t.browse}
-              </Button>
-            </Link>
-            
-            {/* Favorites Link - Kiungo cha vipendwa */}
-            <Link to="/favorites">
-              <Button
-                variant="ghost"
-                className={`px-4 py-2 rounded-full hover:bg-gray-100 flex items-center ${
-                  location.pathname === '/favorites' ? 'bg-gray-100 font-semibold' : ''
-                }`}
-              >
-                <Heart className="h-4 w-4 mr-2" />
-                {t.favorites}
               </Button>
             </Link>
             
@@ -226,18 +210,6 @@ const Navigation = () => {
                 <div className="flex items-center">
                   <Search className="h-5 w-5 mr-3 text-gray-400" />
                   {t.browse}
-                </div>
-              </Link>
-              
-              {/* Mobile Favorites Link - Kiungo cha vipendwa kwa simu */}
-              <Link
-                to="/favorites"
-                className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <div className="flex items-center">
-                  <Heart className="h-5 w-5 mr-3 text-gray-400" />
-                  {t.favorites}
                 </div>
               </Link>
               
