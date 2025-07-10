@@ -16,10 +16,7 @@ export const useProperty = (id: string | undefined) => {
         .from('properties')
         .select(`
           *,
-          profiles:landlord_id (
-            full_name,
-            phone
-          )
+          profiles!fk_landlord_profile(full_name, phone)
         `)
         .eq('id', id)
         .maybeSingle();
@@ -32,7 +29,7 @@ export const useProperty = (id: string | undefined) => {
       // Transform the data to match our Property type
       const transformedProperty = {
         ...data,
-        profiles: data?.profiles || null
+        profiles: data?.profiles?.[0] || data?.profiles
       } as Property;
 
       console.log('Property fetched successfully:', transformedProperty);
