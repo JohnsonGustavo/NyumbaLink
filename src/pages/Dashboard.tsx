@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import ImageUpload from '@/components/ImageUpload';
@@ -19,7 +20,8 @@ import {
   Users,
   DollarSign,
   Upload,
-  X
+  X,
+  Save
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,6 +35,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   
@@ -100,6 +103,29 @@ const Dashboard = () => {
     }));
   };
 
+  const handleEditProperty = (property: Property) => {
+    setEditingProperty(property);
+    setFormData({
+      title: property.title || '',
+      description: property.description || '',
+      price: property.price?.toString() || '',
+      location: property.location || '',
+      full_address: property.full_address || '',
+      property_type: property.property_type || '',
+      bedrooms: property.bedrooms?.toString() || '',
+      bathrooms: property.bathrooms?.toString() || '',
+      area_sqm: property.area_sqm?.toString() || '',
+      electricity: property.electricity || false,
+      water: property.water || false,
+      furnished: property.furnished || false,
+      parking: property.parking || false,
+      security: property.security || false,
+      nearby_services: property.nearby_services || [],
+      images: property.images || []
+    });
+    setShowAddForm(true);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
@@ -127,26 +153,43 @@ const Dashboard = () => {
         images: formData.images
       };
 
-      const { error } = await supabase
-        .from('properties')
-        .insert([propertyData]);
+      if (editingProperty) {
+        // Update existing property
+        const { error } = await supabase
+          .from('properties')
+          .update(propertyData)
+          .eq('id', editingProperty.id);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Umefanikiwa!",
-        description: "Nyumba yako imeongezwa kikamilifu"
-      });
+        toast({
+          title: "Umefanikiwa!",
+          description: "Nyumba yako imesasishwa kikamilifu"
+        });
+      } else {
+        // Create new property
+        const { error } = await supabase
+          .from('properties')
+          .insert([propertyData]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Umefanikiwa!",
+          description: "Nyumba yako imeongezwa kikamilifu"
+        });
+      }
 
       setShowAddForm(false);
+      setEditingProperty(null);
       resetForm();
       fetchProperties();
     } catch (error) {
-      console.error('Error creating property:', error);
+      console.error('Error saving property:', error);
       toast({
         variant: "destructive",
         title: "Hitilafu",
-        description: "Imeshindikana kuongeza nyumba yako"
+        description: editingProperty ? "Imeshindikana kusasisha nyumba yako" : "Imeshindikana kuongeza nyumba yako"
       });
     } finally {
       setSubmitting(false);
@@ -172,6 +215,12 @@ const Dashboard = () => {
       nearby_services: [],
       images: []
     });
+  };
+
+  const handleCancelEdit = () => {
+    setShowAddForm(false);
+    setEditingProperty(null);
+    resetForm();
   };
 
   const handleDeleteProperty = async (id: string) => {
@@ -294,16 +343,18 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Add new property form */}
+        {/* Add/Edit property form */}
         {showAddForm && (
           <Card className="mb-8">
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Ongeza Nyumba Mpya</CardTitle>
+                <CardTitle>
+                  {editingProperty ? 'Sasisha Nyumba' : 'Ongeza Nyumba Mpya'}
+                </CardTitle>
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => setShowAddForm(false)}
+                  onClick={handleCancelEdit}
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -480,7 +531,7 @@ const Dashboard = () => {
                   <Button 
                     type="button" 
                     variant="outline"
-                    onClick={() => setShowAddForm(false)}
+                    onClick={handleCancelEdit}
                     disabled={submitting}
                   >
                     Sitisha
@@ -490,7 +541,7 @@ const Dashboard = () => {
                     className="bg-primary hover:bg-primary/90"
                     disabled={submitting}
                   >
-                    {submitting ? 'Inaongeza...' : 'Ongeza Nyumba'}
+                    {submitting ? (editingProperty ? 'Inasasisha...' : 'Inaongeza...') : (editingProperty ? 'Sasisha Nyumba' : 'Ongeza Nyumba')}
                   </Button>
                 </div>
               </form>
@@ -578,7 +629,11 @@ const Dashboard = () => {
                             <Eye className="h-4 w-4" />
                           </Button>
                         </Link>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleEditProperty(property)}
+                        >
                           <Edit2 className="h-4 w-4" />
                         </Button>
                         <Button 
