@@ -14,6 +14,8 @@ const Browse = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || '');
   const [priceRange, setPriceRange] = useState(searchParams.get('price') || 'all');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
   const [utilities, setUtilities] = useState<string[]>([]);
   const [nearbyServices, setNearbyServices] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('newest');
@@ -21,8 +23,58 @@ const Browse = () => {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // Sample properties data with 30 properties
+  // Sample properties data with affordable options starting from 30,000 TZS
   const allProperties = [
+    {
+      id: '31',
+      title: 'Chumba cha Nafuu Manzese',
+      price: 30000,
+      location: 'Manzese, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop'],
+      utilities: { electricity: false, water: true },
+      nearbyServices: ['market'],
+      landlord: { name: 'Mama Rehema', phone: '+255687123456', email: 'rehema@example.com' }
+    },
+    {
+      id: '32',
+      title: 'Bedsitter ya Rahisi Buguruni',
+      price: 45000,
+      location: 'Buguruni, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: false },
+      nearbyServices: ['market'],
+      landlord: { name: 'Bwana Musa', phone: '+255698765432', email: 'musa@example.com' }
+    },
+    {
+      id: '33',
+      title: 'Single Room Tandale',
+      price: 60000,
+      location: 'Tandale, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1487958449943-2429e8be8625?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'market'],
+      landlord: { name: 'Dada Amina', phone: '+255756432198', email: 'amina@example.com' }
+    },
+    {
+      id: '34',
+      title: 'Chumba cha Rahisi Kimara',
+      price: 80000,
+      location: 'Kimara Stop, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'market'],
+      landlord: { name: 'Mama Fatma', phone: '+255723456789', email: 'fatma@example.com' }
+    },
+    {
+      id: '35',
+      title: 'Bedsitter Mbezi Juu',
+      price: 120000,
+      location: 'Mbezi Juu, Dar es Salaam',
+      images: ['https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=300&fit=crop'],
+      utilities: { electricity: true, water: true },
+      nearbyServices: ['school', 'hospital', 'market'],
+      landlord: { name: 'Ndugu Hassan', phone: '+255689012345', email: 'hassan.b@example.com' }
+    },
     {
       id: '1',
       title: 'Nyumba ya Kisasa Mikocheni',
@@ -331,12 +383,21 @@ const Browse = () => {
       return false;
     }
 
+    // Handle custom price inputs
+    if (minPrice && parseInt(minPrice) > property.price) {
+      return false;
+    }
+    if (maxPrice && parseInt(maxPrice) < property.price) {
+      return false;
+    }
+
+    // Handle predefined price range
     if (priceRange && priceRange !== 'all') {
       const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
-      const minPrice = parseInt(min);
-      const maxPrice = max ? parseInt(max) : Infinity;
+      const minPriceRange = parseInt(min);
+      const maxPriceRange = max ? parseInt(max) : Infinity;
       
-      if (property.price < minPrice || property.price > maxPrice) {
+      if (property.price < minPriceRange || property.price > maxPriceRange) {
         return false;
       }
     }
@@ -380,6 +441,8 @@ const Browse = () => {
   const clearAllFilters = () => {
     setSearchQuery('');
     setPriceRange('all');
+    setMinPrice('');
+    setMaxPrice('');
     setUtilities([]);
     setNearbyServices([]);
     setSortBy('newest');
@@ -424,7 +487,8 @@ const Browse = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Bei yoyote</SelectItem>
-                      <SelectItem value="0-500000">Chini ya 500K</SelectItem>
+                      <SelectItem value="0-100000">Chini ya 100K</SelectItem>
+                      <SelectItem value="100000-500000">100K - 500K</SelectItem>
                       <SelectItem value="500000-1000000">500K - 1M</SelectItem>
                       <SelectItem value="1000000-2000000">1M - 2M</SelectItem>
                       <SelectItem value="2000000+">Zaidi ya 2M</SelectItem>
@@ -450,7 +514,37 @@ const Browse = () => {
               {/* Advanced Filters */}
               {showFilters && (
                 <div className="border-t mt-6 pt-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                      <h4 className="font-semibold text-gray-900 mb-3">Bei ya Maalum</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Bei ya chini (TZS)
+                          </label>
+                          <Input
+                            type="number"
+                            placeholder="30,000"
+                            value={minPrice}
+                            onChange={(e) => setMinPrice(e.target.value)}
+                            className="w-full"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Bei ya juu (TZS)
+                          </label>
+                          <Input
+                            type="number"
+                            placeholder="500,000"
+                            value={maxPrice}
+                            onChange={(e) => setMaxPrice(e.target.value)}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Huduma za Msingi</h4>
                       <div className="space-y-3">
@@ -565,7 +659,7 @@ const Browse = () => {
         </div>
 
         {/* Active Filters */}
-        {(searchQuery || (priceRange && priceRange !== 'all') || utilities.length > 0 || nearbyServices.length > 0) && (
+        {(searchQuery || (priceRange && priceRange !== 'all') || minPrice || maxPrice || utilities.length > 0 || nearbyServices.length > 0) && (
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
               {searchQuery && (
@@ -584,6 +678,28 @@ const Browse = () => {
                   TZS {priceRange}
                   <button
                     onClick={() => setPriceRange('all')}
+                    className="ml-2 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {minPrice && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  Min: TZS {parseInt(minPrice).toLocaleString()}
+                  <button
+                    onClick={() => setMinPrice('')}
+                    className="ml-2 hover:text-red-500"
+                  >
+                    ×
+                  </button>
+                </Badge>
+              )}
+              {maxPrice && (
+                <Badge variant="secondary" className="px-3 py-1">
+                  Max: TZS {parseInt(maxPrice).toLocaleString()}
+                  <button
+                    onClick={() => setMaxPrice('')}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
