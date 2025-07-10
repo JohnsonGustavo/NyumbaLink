@@ -32,6 +32,10 @@ const PropertyDetail = () => {
   const [isFavorited, setIsFavorited] = useState(false);
 
   const { data: property, isLoading, error } = useProperty(id);
+  
+  // Debug logging
+  console.log('Property data:', property);
+  console.log('Property profiles:', property?.profiles);
 
   const serviceIcons = {
     school: { icon: School, label: 'Shule' },
