@@ -33,8 +33,17 @@ export const useProperties = () => {
         throw error;
       }
 
-      console.log('Properties fetched successfully:', data);
-      return data as Property[];
+      // Transform the data to match our Property type
+      // Supabase returns profiles as an array, but we need a single object
+      const transformedData = data?.map(property => ({
+        ...property,
+        profiles: Array.isArray(property.profiles) && property.profiles.length > 0 
+          ? property.profiles[0] 
+          : undefined
+      })) || [];
+
+      console.log('Properties fetched successfully:', transformedData);
+      return transformedData as Property[];
     },
   });
 };
