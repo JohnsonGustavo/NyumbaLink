@@ -20,7 +20,7 @@ export const useProperties = () => {
         .from('properties')
         .select(`
           *,
-          profiles!properties_landlord_id_fkey (
+          profiles!fk_landlord_profile (
             full_name,
             phone
           )
