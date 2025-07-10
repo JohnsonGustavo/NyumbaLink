@@ -14,8 +14,8 @@ const Browse = () => {
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || '');
   const [priceRange, setPriceRange] = useState(searchParams.get('price') || 'all');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [utilities, setUtilities] = useState<string[]>([]);
   const [nearbyServices, setNearbyServices] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('newest');
@@ -379,8 +379,26 @@ const Browse = () => {
 
   // Filter properties based on search criteria
   const filteredProperties = allProperties.filter(property => {
-    if (searchQuery && !property.location.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
+    // Enhanced location filtering to handle city names better
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const location = property.location.toLowerCase();
+      
+      // Check if location contains the query or if query is a major city that matches
+      const cityMatches = (
+        location.includes(query) ||
+        (query.includes('dar es salaam') && location.includes('dar es salaam')) ||
+        (query.includes('dar') && location.includes('dar es salaam')) ||
+        (query.includes('mbeya') && location.includes('mbeya')) ||
+        (query.includes('arusha') && location.includes('arusha')) ||
+        (query.includes('mwanza') && location.includes('mwanza')) ||
+        (query.includes('dodoma') && location.includes('dodoma')) ||
+        (query.includes('zanzibar') && location.includes('zanzibar'))
+      );
+      
+      if (!cityMatches) {
+        return false;
+      }
     }
 
     // Handle custom price inputs

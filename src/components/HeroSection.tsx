@@ -9,6 +9,8 @@ import heroBackground from '@/assets/hero-background.jpg';
 
 const HeroSection = () => {
   const [searchLocation, setSearchLocation] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
 
   return (
     <div className="relative min-h-[100vh] flex items-center">
@@ -36,9 +38,9 @@ const HeroSection = () => {
         <div className="max-w-4xl mx-auto mb-16">
           <Card className="shadow-2xl border-0 overflow-hidden bg-white/95 backdrop-blur-sm">
             <CardContent className="p-8">
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {/* Location */}
-                <div className="lg:col-span-2">
+                <div>
                   <label className="block text-sm font-semibold text-foreground mb-2">
                     Unataka wapi?
                   </label>
@@ -54,23 +56,37 @@ const HeroSection = () => {
                 </div>
 
                 {/* Price Range */}
-                <div>
-                  <label className="block text-sm font-semibold text-foreground mb-2">
-                    Bei (TZS)
-                  </label>
-                  <select className="w-full h-14 px-4 border-2 border-border rounded-md focus:border-primary focus:outline-none text-lg bg-background">
-                    <option value="">Chagua bei</option>
-                    <option value="0-500000">Chini ya 500K</option>
-                    <option value="500000-1000000">500K - 1M</option>
-                    <option value="1000000-2000000">1M - 2M</option>
-                    <option value="2000000+">Zaidi ya 2M</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-sm font-semibold text-foreground mb-2">
+                      Bei ya Chini (TZS)
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="30,000"
+                      value={minPrice}
+                      onChange={(e) => setMinPrice(e.target.value)}
+                      className="h-14 text-lg border-2 border-border focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-foreground mb-2">
+                      Bei ya Juu (TZS)
+                    </label>
+                    <Input
+                      type="number"
+                      placeholder="1,000,000"
+                      value={maxPrice}
+                      onChange={(e) => setMaxPrice(e.target.value)}
+                      className="h-14 text-lg border-2 border-border focus:border-primary"
+                    />
+                  </div>
                 </div>
 
                 {/* Search Button */}
                 <div className="flex items-end">
                   <Link 
-                    to={`/browse${searchLocation ? `?location=${encodeURIComponent(searchLocation)}` : ''}`}
+                    to={`/browse${searchLocation || minPrice || maxPrice ? '?' : ''}${searchLocation ? `location=${encodeURIComponent(searchLocation)}` : ''}${searchLocation && (minPrice || maxPrice) ? '&' : ''}${minPrice ? `minPrice=${minPrice}` : ''}${minPrice && maxPrice ? '&' : ''}${maxPrice ? `maxPrice=${maxPrice}` : ''}`}
                     className="w-full"
                   >
                     <Button size="lg" className="w-full h-14 text-lg bg-primary hover:bg-primary/90 shadow-lg">
