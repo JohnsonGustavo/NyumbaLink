@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
+import ImageUpload from '@/components/ImageUpload';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -467,6 +467,14 @@ const Dashboard = () => {
                   </div>
                 </div>
 
+                {/* Image Upload Section */}
+                <div className="border-t pt-6">
+                  <ImageUpload
+                    images={formData.images}
+                    onImagesChange={(images) => handleInputChange('images', images)}
+                  />
+                </div>
+
                 {/* Submit buttons */}
                 <div className="flex justify-end space-x-4">
                   <Button 
@@ -516,9 +524,21 @@ const Dashboard = () => {
                   <div key={property.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex space-x-4">
-                        {/* Image placeholder */}
+                        {/* Image display */}
                         <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center">
-                          <Home className="h-8 w-8 text-gray-400" />
+                          {property.images && property.images.length > 0 ? (
+                            <img
+                              src={property.images[0]}
+                              alt={property.title}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                                target.nextElementSibling!.classList.remove('hidden');
+                              }}
+                            />
+                          ) : null}
+                          <Home className={`h-8 w-8 text-gray-400 ${property.images && property.images.length > 0 ? 'hidden' : ''}`} />
                         </div>
 
                         {/* Details */}
@@ -542,6 +562,11 @@ const Dashboard = () => {
                             <span className="text-sm text-gray-600">
                               👁️ {property.views_count || 0} miwani
                             </span>
+                            {property.images && property.images.length > 0 && (
+                              <span className="text-sm text-gray-600">
+                                📷 {property.images.length} picha
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
