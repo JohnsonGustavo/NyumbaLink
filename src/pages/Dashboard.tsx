@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { 
   Plus, 
   Edit2, 
@@ -23,46 +22,70 @@ import {
   X
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import type { Tables } from '@/integrations/supabase/types';
+
+type Property = Tables<'properties'>;
 
 const Dashboard = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [showAddForm, setShowAddForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     price: '',
     location: '',
-    fullAddress: '',
+    full_address: '',
+    property_type: '',
+    bedrooms: '',
+    bathrooms: '',
+    area_sqm: '',
     electricity: false,
     water: false,
-    nearbyServices: [] as string[],
+    furnished: false,
+    parking: false,
+    security: false,
+    nearby_services: [] as string[],
     images: [] as string[]
   });
 
-  // Sample listings data
-  const [listings, setListings] = useState([
-    {
-      id: '1',
-      title: 'Nyumba ya Kisasa Mikocheni',
-      description: 'Nyumba nzuri ya vyumba 3 na jiko la kisasa...',
-      price: 800000,
-      location: 'Mikocheni, Dar es Salaam',
-      status: 'active',
-      views: 156,
-      inquiries: 8,
-      images: ['https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop']
-    },
-    {
-      id: '2',
-      title: 'Apartmenti ya Ufukweni',
-      description: 'Chumba kimoja na jiko. Karibu na barabara kuu...',
-      price: 400000,
-      location: 'Mwananyamala, Dar es Salaam',
-      status: 'active',
-      views: 89,
-      inquiries: 12,
-      images: ['https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=300&fit=crop']
+  const [properties, setProperties] = useState<Property[]>([]);
+
+  // Fetch properties on component mount
+  useEffect(() => {
+    if (user) {
+      fetchProperties();
     }
-  ]);
+  }, [user]);
+
+  const fetchProperties = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('properties')
+        .select('*')
+        .eq('landlord_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setProperties(data || []);
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+      toast({
+        variant: "destructive",
+        title: "Hitilafu",
+        description: "Imeshindikana kupata nyumba zako"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -71,42 +94,129 @@ const Dashboard = () => {
   const handleServiceToggle = (service: string) => {
     setFormData(prev => ({
       ...prev,
-      nearbyServices: prev.nearbyServices.includes(service)
-        ? prev.nearbyServices.filter(s => s !== service)
-        : [...prev.nearbyServices, service]
+      nearby_services: prev.nearby_services.includes(service)
+        ? prev.nearby_services.filter(s => s !== service)
+        : [...prev.nearby_services, service]
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Here you would submit to your backend
-    setShowAddForm(false);
-    // Reset form
+    if (!user) return;
+
+    try {
+      setSubmitting(true);
+      
+      const propertyData = {
+        landlord_id: user.id,
+        title: formData.title,
+        description: formData.description,
+        price: parseFloat(formData.price),
+        location: formData.location,
+        full_address: formData.full_address || null,
+        property_type: formData.property_type || null,
+        bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
+        bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
+        area_sqm: formData.area_sqm ? parseFloat(formData.area_sqm) : null,
+        electricity: formData.electricity,
+        water: formData.water,
+        furnished: formData.furnished,
+        parking: formData.parking,
+        security: formData.security,
+        nearby_services: formData.nearby_services,
+        images: formData.images
+      };
+
+      const { error } = await supabase
+        .from('properties')
+        .insert([propertyData]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Umefanikiwa!",
+        description: "Nyumba yako imeongezwa kikamilifu"
+      });
+
+      setShowAddForm(false);
+      resetForm();
+      fetchProperties();
+    } catch (error) {
+      console.error('Error creating property:', error);
+      toast({
+        variant: "destructive",
+        title: "Hitilafu",
+        description: "Imeshindikana kuongeza nyumba yako"
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
     setFormData({
       title: '',
       description: '',
       price: '',
       location: '',
-      fullAddress: '',
+      full_address: '',
+      property_type: '',
+      bedrooms: '',
+      bathrooms: '',
+      area_sqm: '',
       electricity: false,
       water: false,
-      nearbyServices: [],
+      furnished: false,
+      parking: false,
+      security: false,
+      nearby_services: [],
       images: []
     });
   };
 
-  const handleDeleteListing = (id: string) => {
-    if (confirm('Una uhakika unataka kufuta tangazo hili?')) {
-      setListings(prev => prev.filter(listing => listing.id !== id));
+  const handleDeleteProperty = async (id: string) => {
+    if (!confirm('Una uhakika unataka kufuta tangazo hili?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('properties')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Umefanikiwa!",
+        description: "Nyumba imefutwa kikamilifu"
+      });
+
+      fetchProperties();
+    } catch (error) {
+      console.error('Error deleting property:', error);
+      toast({
+        variant: "destructive",
+        title: "Hitilafu",
+        description: "Imeshindikana kufuta nyumba"
+      });
     }
   };
 
-  const totalViews = listings.reduce((sum, listing) => sum + listing.views, 0);
-  const totalInquiries = listings.reduce((sum, listing) => sum + listing.inquiries, 0);
-  const averagePrice = listings.length > 0 
-    ? listings.reduce((sum, listing) => sum + listing.price, 0) / listings.length
+  // Calculate stats
+  const totalViews = properties.reduce((sum, property) => sum + (property.views_count || 0), 0);
+  const averagePrice = properties.length > 0 
+    ? properties.reduce((sum, property) => sum + Number(property.price), 0) / properties.length
     : 0;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">Inapakia...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,7 +246,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Jumla ya Nyumba</p>
-                  <p className="text-3xl font-bold text-gray-900">{listings.length}</p>
+                  <p className="text-3xl font-bold text-gray-900">{properties.length}</p>
                 </div>
                 <Home className="h-8 w-8 text-primary" />
               </div>
@@ -159,10 +269,12 @@ const Dashboard = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Maswali</p>
-                  <p className="text-3xl font-bold text-gray-900">{totalInquiries}</p>
+                  <p className="text-sm font-medium text-gray-600">Nyumba Zinazoonekana</p>
+                  <p className="text-3xl font-bold text-gray-900">
+                    {properties.filter(p => p.status === 'active').length}
+                  </p>
                 </div>
-                <Users className="h-8 w-8 text-primary" />
+                <TrendingUp className="h-8 w-8 text-primary" />
               </div>
             </CardContent>
           </Card>
@@ -237,13 +349,41 @@ const Dashboard = () => {
                     </div>
 
                     <div>
-                      <Label htmlFor="fullAddress">Anwani kamili</Label>
-                      <Input
-                        id="fullAddress"
-                        value={formData.fullAddress}
-                        onChange={(e) => handleInputChange('fullAddress', e.target.value)}
-                        placeholder="Barabara ya Mikocheni, Klabu ya Mikocheni..."
-                      />
+                      <Label htmlFor="property_type">Aina ya Nyumba</Label>
+                      <Select value={formData.property_type} onValueChange={(value) => handleInputChange('property_type', value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Chagua aina ya nyumba" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="apartment">Ghorofa</SelectItem>
+                          <SelectItem value="house">Nyumba</SelectItem>
+                          <SelectItem value="room">Chumba</SelectItem>
+                          <SelectItem value="studio">Studio</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="bedrooms">Vyumba vya Kulala</Label>
+                        <Input
+                          id="bedrooms"
+                          type="number"
+                          value={formData.bedrooms}
+                          onChange={(e) => handleInputChange('bedrooms', e.target.value)}
+                          placeholder="2"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="bathrooms">Vyumba vya Kuogea</Label>
+                        <Input
+                          id="bathrooms"
+                          type="number"
+                          value={formData.bathrooms}
+                          onChange={(e) => handleInputChange('bathrooms', e.target.value)}
+                          placeholder="1"
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -279,6 +419,27 @@ const Dashboard = () => {
                             onCheckedChange={(checked) => handleInputChange('water', checked)}
                           />
                         </div>
+                        <div className="flex items-center justify-between">
+                          <span>Vifaa vya Nyumbani</span>
+                          <Switch
+                            checked={formData.furnished}
+                            onCheckedChange={(checked) => handleInputChange('furnished', checked)}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Mahali pa Kuegesha Gari</span>
+                          <Switch
+                            checked={formData.parking}
+                            onCheckedChange={(checked) => handleInputChange('parking', checked)}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>Usalama</span>
+                          <Switch
+                            checked={formData.security}
+                            onCheckedChange={(checked) => handleInputChange('security', checked)}
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -290,7 +451,7 @@ const Dashboard = () => {
                           <label key={service} className="flex items-center space-x-2">
                             <input
                               type="checkbox"
-                              checked={formData.nearbyServices.includes(service)}
+                              checked={formData.nearby_services.includes(service)}
                               onChange={() => handleServiceToggle(service)}
                             />
                             <span className="text-sm">
@@ -306,27 +467,22 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Image upload placeholder */}
-                <div>
-                  <Label>Picha za Nyumba</Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">Bofya hapa kupakia picha au buruta hapa</p>
-                    <p className="text-sm text-gray-500 mt-1">PNG, JPG hadi 5MB</p>
-                  </div>
-                </div>
-
                 {/* Submit buttons */}
                 <div className="flex justify-end space-x-4">
                   <Button 
                     type="button" 
                     variant="outline"
                     onClick={() => setShowAddForm(false)}
+                    disabled={submitting}
                   >
                     Sitisha
                   </Button>
-                  <Button type="submit" className="bg-primary hover:bg-primary/90">
-                    Ongeza Nyumba
+                  <Button 
+                    type="submit" 
+                    className="bg-primary hover:bg-primary/90"
+                    disabled={submitting}
+                  >
+                    {submitting ? 'Inaongeza...' : 'Ongeza Nyumba'}
                   </Button>
                 </div>
               </form>
@@ -334,13 +490,13 @@ const Dashboard = () => {
           </Card>
         )}
 
-        {/* Listings table */}
+        {/* Properties list */}
         <Card>
           <CardHeader>
             <CardTitle>Nyumba Zako</CardTitle>
           </CardHeader>
           <CardContent>
-            {listings.length === 0 ? (
+            {properties.length === 0 ? (
               <div className="text-center py-8">
                 <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -356,42 +512,35 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="space-y-4">
-                {listings.map((listing) => (
-                  <div key={listing.id} className="border rounded-lg p-4">
+                {properties.map((property) => (
+                  <div key={property.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex space-x-4">
-                        {/* Image */}
-                        <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                          <img
-                            src={listing.images[0]}
-                            alt={listing.title}
-                            className="w-full h-full object-cover"
-                          />
+                        {/* Image placeholder */}
+                        <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200 flex items-center justify-center">
+                          <Home className="h-8 w-8 text-gray-400" />
                         </div>
 
                         {/* Details */}
                         <div className="flex-1">
                           <h3 className="font-semibold text-lg text-gray-900 mb-1">
-                            {listing.title}
+                            {property.title}
                           </h3>
                           <p className="text-gray-600 mb-2 line-clamp-2">
-                            {listing.description}
+                            {property.description}
                           </p>
                           <div className="flex items-center space-x-4 text-sm text-gray-600">
-                            <span>📍 {listing.location}</span>
-                            <span>💰 TZS {listing.price.toLocaleString()}/mwezi</span>
+                            <span>📍 {property.location}</span>
+                            <span>💰 TZS {Number(property.price).toLocaleString()}/mwezi</span>
                           </div>
                           <div className="flex items-center space-x-4 mt-2">
                             <Badge 
-                              className={listing.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
+                              className={property.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
                             >
-                              {listing.status === 'active' ? 'Inaonekana' : 'Imesitishwa'}
+                              {property.status === 'active' ? 'Inaonekana' : 'Imesitishwa'}
                             </Badge>
                             <span className="text-sm text-gray-600">
-                              👁️ {listing.views} miwani
-                            </span>
-                            <span className="text-sm text-gray-600">
-                              💬 {listing.inquiries} maswali
+                              👁️ {property.views_count || 0} miwani
                             </span>
                           </div>
                         </div>
@@ -399,7 +548,7 @@ const Dashboard = () => {
 
                       {/* Actions */}
                       <div className="flex space-x-2">
-                        <Link to={`/property/${listing.id}`}>
+                        <Link to={`/property/${property.id}`}>
                           <Button variant="outline" size="sm">
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -410,7 +559,7 @@ const Dashboard = () => {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => handleDeleteListing(listing.id)}
+                          onClick={() => handleDeleteProperty(property.id)}
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />

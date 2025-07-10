@@ -44,6 +44,150 @@ export type Database = {
         }
         Relationships: []
       }
+      properties: {
+        Row: {
+          area_sqm: number | null
+          bathrooms: number | null
+          bedrooms: number | null
+          created_at: string
+          description: string | null
+          electricity: boolean | null
+          full_address: string | null
+          furnished: boolean | null
+          id: string
+          images: string[] | null
+          landlord_id: string
+          location: string
+          nearby_services: string[] | null
+          parking: boolean | null
+          price: number
+          property_type: string | null
+          security: boolean | null
+          status: string | null
+          title: string
+          updated_at: string
+          views_count: number | null
+          water: boolean | null
+        }
+        Insert: {
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          created_at?: string
+          description?: string | null
+          electricity?: boolean | null
+          full_address?: string | null
+          furnished?: boolean | null
+          id?: string
+          images?: string[] | null
+          landlord_id: string
+          location: string
+          nearby_services?: string[] | null
+          parking?: boolean | null
+          price: number
+          property_type?: string | null
+          security?: boolean | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          views_count?: number | null
+          water?: boolean | null
+        }
+        Update: {
+          area_sqm?: number | null
+          bathrooms?: number | null
+          bedrooms?: number | null
+          created_at?: string
+          description?: string | null
+          electricity?: boolean | null
+          full_address?: string | null
+          furnished?: boolean | null
+          id?: string
+          images?: string[] | null
+          landlord_id?: string
+          location?: string
+          nearby_services?: string[] | null
+          parking?: boolean | null
+          price?: number
+          property_type?: string | null
+          security?: boolean | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          views_count?: number | null
+          water?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_landlord_profile"
+            columns: ["landlord_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      property_inquiries: {
+        Row: {
+          created_at: string
+          id: string
+          landlord_id: string
+          message: string
+          property_id: string
+          status: string | null
+          tenant_email: string | null
+          tenant_id: string
+          tenant_name: string | null
+          tenant_phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          landlord_id: string
+          message: string
+          property_id: string
+          status?: string | null
+          tenant_email?: string | null
+          tenant_id: string
+          tenant_name?: string | null
+          tenant_phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          landlord_id?: string
+          message?: string
+          property_id?: string
+          status?: string | null
+          tenant_email?: string | null
+          tenant_id?: string
+          tenant_name?: string | null
+          tenant_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_inquiry_landlord"
+            columns: ["landlord_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "fk_inquiry_tenant"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "property_inquiries_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
