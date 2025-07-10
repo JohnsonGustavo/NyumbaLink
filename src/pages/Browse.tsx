@@ -1,3 +1,37 @@
+/**
+ * BROWSE.TSX - PROPERTY LISTING AND SEARCH PAGE
+ * =============================================
+ * 
+ * Ukurasa wa kutazama na kutafuta nyumba - Property browsing and search page
+ * 
+ * MAIN FUNCTIONALITY / KAZI KEKUU:
+ * - Display all available properties (Kuonyesha nyumba zote zinazopatikana)
+ * - Advanced filtering by location, price, utilities (Vichujio vya kirefu vya eneo, bei, huduma)
+ * - Property search functionality (Utendakazi wa kutafuta nyumba)
+ * - Sorting options (price, date, etc.) (Chaguo za kupanga)
+ * - Grid and list view modes (Hali za kuona kama gridi na orodha)
+ * - Favorites management (Usimamizi wa vipendwa)
+ * 
+ * DATA FLOW / MTIRIRIKO WA DATA:
+ * 1. Receives URL parameters from HeroSection or PopularDestinations
+ * 2. Filters properties based on search criteria
+ * 3. Displays filtered results with pagination
+ * 4. Allows users to save favorites and navigate to property details
+ * 
+ * COMPONENT INTERACTIONS / MWINGILIANO WA VIPENGELE:
+ * - Receives search params from: HeroSection, PopularDestinations
+ * - Navigates to: PropertyDetail page
+ * - Uses: PropertyCard component for display
+ * - Manages: Favorites state across the application
+ * 
+ * FILTERING LOGIC / MANTIKI YA KUCHUJA:
+ * - Location: Partial matching for city names and areas
+ * - Price: Range filtering with min/max values
+ * - Utilities: Multiple selection (electricity, water)
+ * - Services: Multiple selection (schools, hospitals, markets)
+ * - Sorting: By price, date, relevance
+ */
+
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import PropertyCard from '@/components/PropertyCard';
@@ -10,20 +44,43 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Filter, MapPin, SlidersHorizontal, X, Grid3X3, List } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 
+/**
+ * Browse Properties Component
+ * Kipengele cha kutazama nyumba
+ * 
+ * This component handles the main property browsing experience with advanced filtering,
+ * search capabilities, and multiple view modes for user convenience.
+ * 
+ * Kipengele hiki kinashughulikia tajriba ya kutazama nyumba na vichujio vya kirefu,
+ * uwezo wa kutafuta, na hali nyingi za kuona kwa urahisi wa mtumiaji.
+ */
 const Browse = () => {
+  // URL parameter handling for search state persistence
+  // Kushughulikia vigezo vya URL kwa kudumu kwa hali ya utafutaji
   const [searchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || '');
-  const [priceRange, setPriceRange] = useState(searchParams.get('price') || 'all');
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-  const [utilities, setUtilities] = useState<string[]>([]);
-  const [nearbyServices, setNearbyServices] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
+  // Search and filter state management
+  // Usimamizi wa hali ya utafutaji na vichujio
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || ''); // Location search
+  const [priceRange, setPriceRange] = useState(searchParams.get('price') || 'all'); // Predefined price ranges
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || ''); // Custom minimum price
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || ''); // Custom maximum price
+  const [utilities, setUtilities] = useState<string[]>([]); // Utilities filter (electricity, water)
+  const [nearbyServices, setNearbyServices] = useState<string[]>([]); // Services filter (schools, hospitals)
+  const [sortBy, setSortBy] = useState('newest'); // Sorting preference
+  const [showFilters, setShowFilters] = useState(false); // Filter panel visibility
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]); // User's favorite properties
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // Display mode preference
 
-  // Sample properties data with affordable options starting from 30,000 TZS
+  /**
+   * SAMPLE PROPERTIES DATA / DATA YA MFANO YA NYUMBA
+   * 
+   * This contains mock data for properties across Tanzania with various price ranges
+   * to demonstrate the filtering and search functionality.
+   * 
+   * Hii ina data ya mfano ya nyumba kote Tanzania na bei mbalimbali
+   * kuonyesha utendakazi wa kuchuja na kutafuta.
+   */
   const allProperties = [
     {
       id: '31',
