@@ -16,7 +16,7 @@ export const useProperty = (id: string | undefined) => {
         .from('properties')
         .select(`
           *,
-          profiles!fk_landlord_profile (
+          profiles:landlord_id (
             full_name,
             phone
           )
@@ -32,9 +32,7 @@ export const useProperty = (id: string | undefined) => {
       // Transform the data to match our Property type
       const transformedProperty = {
         ...data,
-        profiles: Array.isArray(data?.profiles) && data.profiles.length > 0 
-          ? data.profiles[0] 
-          : data?.profiles || null
+        profiles: data?.profiles || null
       } as Property;
 
       console.log('Property fetched successfully:', transformedProperty);
