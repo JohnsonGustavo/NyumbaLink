@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Property } from './useProperties';
@@ -17,7 +16,7 @@ export const useProperty = (id: string | undefined) => {
         .from('properties')
         .select(`
           *,
-          profiles!properties_landlord_id_fkey (
+          profiles!fk_landlord_profile (
             full_name,
             phone
           )
@@ -30,11 +29,6 @@ export const useProperty = (id: string | undefined) => {
         throw error;
       }
 
-      if (!data) {
-        console.log('No property found with ID:', id);
-        return null;
-      }
-
       // Transform the data to match our Property type
       const transformedProperty = {
         ...data,
@@ -44,7 +38,6 @@ export const useProperty = (id: string | undefined) => {
       } as Property;
 
       console.log('Property fetched successfully:', transformedProperty);
-      console.log('Property profiles:', transformedProperty.profiles);
       return transformedProperty;
     },
     enabled: !!id, // Only run query if ID exists
