@@ -39,16 +39,14 @@ import { Link } from 'react-router-dom';
 import heroBackground from '@/assets/hero-background.jpg';
 
 /**
- * Hero Section Component - Enhanced Version
- * Kipengele cha sehemu ya kishujaa - Toleo la Kuboresha
+ * Hero Section Component
+ * Kipengele cha sehemu ya kishujaa
  * 
  * This is the primary component that users see when they land on the homepage.
  * It combines search functionality with inspirational messaging and platform statistics.
- * Enhanced with better design, animations, and company mission reflection.
  * 
  * Hiki ni kipengele kikuu ambacho watumiaji wanaona wanapofikia ukurasa wa kwanza.
  * Kinaunganisha utendakazi wa utafutaji na ujumbe wa kuhamasisha na takwimu za jukwaa.
- * Kimeboreshwa na muundo bora, michoro, na kuonyesha dhamira ya kampuni.
  */
 const HeroSection = () => {
   // Search form state management
@@ -58,70 +56,29 @@ const HeroSection = () => {
   const [maxPrice, setMaxPrice] = useState('');           // Maximum price filter
 
   return (
-    <div className="relative min-h-[100vh] flex items-center overflow-hidden">
-      {/* Enhanced Hero Background with Gradient Overlay */}
+    <div className="relative min-h-[100vh] flex items-center">
+      {/* Hero Background Image - Picha ya nyuma ya kishujaa */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroBackground})` }}
       />
       
-      {/* Multi-layer overlay for better visual hierarchy */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-primary/20" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-safari-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
-      </div>
+      {/* Dark overlay for text readability - Uwazi wa giza kwa kusoma vizuri */}
+      <div className="absolute inset-0 bg-black/40" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        {/* Company Mission Badge */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 mb-6">
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-            <span className="text-white/90 font-medium">Tanzania's #1 Property Platform</span>
-          </div>
-        </div>
-
-        {/* Enhanced Main Hero Content */}
-        <div className="text-center mb-16">
-          {/* Enhanced primary headline with animation */}
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight animate-fade-in">
-            Karibu Nyumbani
-            <span className="block bg-gradient-to-r from-primary via-safari-400 to-primary bg-clip-text text-transparent animate-pulse">
-              Nyumba Link
-            </span>
-            <span className="block text-3xl md:text-4xl lg:text-5xl mt-4 text-white/90">
-              Unganisha Ndoto na Nyumba
-            </span>
+        {/* Main Hero Content - Maudhui makuu ya kishujaa */}
+        <div className="text-center mb-12">
+          {/* Primary headline - Kichwa kikuu */}
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            Pata Nyumba ya
+            <span className="block text-primary">Ndoto Yako</span>
           </h1>
           
-          {/* Enhanced supporting message with value propositions */}
-          <div className="max-w-4xl mx-auto space-y-4 mb-12">
-            <p className="text-xl md:text-2xl text-white/95 leading-relaxed">
-              Kutoka studio za kisasa Dar es Salaam hadi villa za baharini Zanzibar
-            </p>
-            <p className="text-lg md:text-xl text-white/80 leading-relaxed">
-              Tumekuunganisha na mali bora zaidi Tanzania - haraka, salama, na kwa bei nafuu
-            </p>
-          </div>
-
-          {/* Trust indicators */}
-          <div className="flex flex-wrap justify-center items-center gap-8 mb-12">
-            <div className="flex items-center gap-2 text-white/80">
-              <div className="w-3 h-3 bg-green-400 rounded-full" />
-              <span className="text-sm font-medium">Makazi yaliyohakikiwa</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/80">
-              <div className="w-3 h-3 bg-blue-400 rounded-full" />
-              <span className="text-sm font-medium">Msaada wa 24/7</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/80">
-              <div className="w-3 h-3 bg-primary rounded-full" />
-              <span className="text-sm font-medium">Miamala salama</span>
-            </div>
-          </div>
+          {/* Supporting message - Ujumbe wa kusaidia */}
+          <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-12 leading-relaxed">
+            Kutoka studio za kisasa hadi nyumba za familia - pata mahali pazuri pa kuishi Tanzania
+          </p>
         </div>
 
         {/* Search Interface Card - Kadi ya kiolesura cha utafutaji */}
@@ -193,51 +150,30 @@ const HeroSection = () => {
           </Card>
         </div>
 
-        {/* Enhanced Platform Statistics - Takwimu za jukwaa zilizobora */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {/* Verified Properties - Mali zilizohakikiwa */}
-          <div className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-            <div className="text-4xl font-bold text-white mb-3 group-hover:text-primary transition-colors">2,500+</div>
-            <div className="text-white/90 font-medium">Mali zilizohakikiwa</div>
-            <div className="text-white/60 text-sm mt-1">Kila mji mkuu</div>
+        {/* Platform Statistics - Takwimu za jukwaa */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {/* Available Properties - Nyumba zinazopatikana */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="text-4xl font-bold text-white mb-2">500+</div>
+            <div className="text-white/80">Nyumba zinapatikana</div>
           </div>
           
-          {/* Regional Coverage - Mkoa uliofunikwa */}
-          <div className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-            <div className="text-4xl font-bold text-white mb-3 group-hover:text-safari-400 transition-colors">26</div>
-            <div className="text-white/90 font-medium">Mikoa yote</div>
-            <div className="text-white/60 text-sm mt-1">Tanzania nzima</div>
+          {/* Major Cities Coverage - Miji mikuu */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="text-4xl font-bold text-white mb-2">50+</div>
+            <div className="text-white/80">Miji mikuu</div>
           </div>
           
-          {/* Successful Connections - Miunganiko mafanikio */}
-          <div className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-            <div className="text-4xl font-bold text-white mb-3 group-hover:text-kilimanjaro-400 transition-colors">5,000+</div>
-            <div className="text-white/90 font-medium">Familia zilizohamia</div>
-            <div className="text-white/60 text-sm mt-1">Nyumba mpya</div>
+          {/* Happy Customers - Wateja wenye furaha */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="text-4xl font-bold text-white mb-2">1000+</div>
+            <div className="text-white/80">Wateja wenye furaha</div>
           </div>
           
-          {/* Average Response Time - Muda wa majibu */}
-          <div className="group bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
-            <div className="text-4xl font-bold text-white mb-3 group-hover:text-primary transition-colors">&lt;2min</div>
-            <div className="text-white/90 font-medium">Muda wa majibu</div>
-            <div className="text-white/60 text-sm mt-1">Msaada wa haraka</div>
-          </div>
-        </div>
-
-        {/* Call-to-Action Section */}
-        <div className="text-center mt-16 pt-8 border-t border-white/20">
-          <p className="text-white/80 text-lg mb-6">
-            Jisajili leo na upate taarifa za nyumba mpya kila siku
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Button variant="outline" size="lg" className="bg-white/10 border-white/30 text-white hover:bg-white/20">
-              Kuhusu Sisi
-            </Button>
-            <Link to="/browse">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-white shadow-lg">
-                Anza Kutafuta Sasa
-              </Button>
-            </Link>
+          {/* Customer Support - Msaada wa wateja */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+            <div className="text-4xl font-bold text-white mb-2">24/7</div>
+            <div className="text-white/80">Msaada wa haraka</div>
           </div>
         </div>
       </div>
