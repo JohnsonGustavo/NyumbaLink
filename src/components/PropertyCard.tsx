@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Heart, MapPin, Star } from 'lucide-react';
+import { Heart, MapPin, Star, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface PropertyCardProps {
@@ -12,6 +12,7 @@ interface PropertyCardProps {
   price: number;
   location: string;
   images: string[];
+  phone?: string;
   isFavorited?: boolean;
   onToggleFavorite?: (id: string) => void;
   viewMode?: 'grid' | 'list';
@@ -23,6 +24,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   price,
   location,
   images,
+  phone,
   isFavorited = false,
   onToggleFavorite,
   viewMode = 'grid'
@@ -84,12 +86,26 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 </div>
 
                 {/* Rating */}
-                <div className="flex items-center pt-2">
+                <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center">
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
                     <span className="text-sm font-medium text-gray-900 ml-1">4.8</span>
                     <span className="text-sm text-gray-500 ml-1">(12 maoni)</span>
                   </div>
+                  
+                  {/* WhatsApp Contact Button */}
+                  {phone && (
+                    <a
+                      href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-full text-xs transition-colors"
+                    >
+                      <Phone className="h-3 w-3 mr-1" />
+                      Piga
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -163,14 +179,28 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <span className="text-sm text-gray-500 ml-1">(12)</span>
             </div>
 
-            {/* Price */}
-            <div className="pt-1">
+            {/* Price and Contact */}
+            <div className="pt-1 flex items-center justify-between">
               <div className="flex items-baseline">
                 <span className="text-lg font-bold text-gray-900">
                   TZS {price.toLocaleString()}
                 </span>
                 <span className="text-gray-500 ml-1 text-sm">/mwezi</span>
               </div>
+              
+              {/* WhatsApp Contact Button */}
+              {phone && (
+                <a
+                  href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex items-center bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-full text-xs transition-colors"
+                >
+                  <Phone className="h-3 w-3 mr-1" />
+                  Piga
+                </a>
+              )}
             </div>
           </div>
         </CardContent>

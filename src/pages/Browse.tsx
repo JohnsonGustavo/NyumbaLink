@@ -807,6 +807,7 @@ const Browse = () => {
               <PropertyCard
                 key={property.id}
                 {...property}
+                phone={property.landlord?.phone}
                 isFavorited={favoriteIds.includes(property.id)}
                 onToggleFavorite={handleToggleFavorite}
                 viewMode={viewMode}

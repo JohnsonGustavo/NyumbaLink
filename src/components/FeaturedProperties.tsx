@@ -15,6 +15,7 @@ const FeaturedProperties = () => {
       reviews: 127,
       image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=500&h=400&fit=crop',
       amenities: ['WiFi', 'Parking', 'Kitchen'],
+      phone: '+255712345678',
       featured: true
     },
     {
@@ -26,6 +27,7 @@ const FeaturedProperties = () => {
       reviews: 89,
       image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=400&fit=crop',
       amenities: ['WiFi', 'Parking'],
+      phone: '+255756789012',
       featured: true
     },
     {
@@ -37,6 +39,7 @@ const FeaturedProperties = () => {
       reviews: 156,
       image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=500&h=400&fit=crop',
       amenities: ['WiFi', 'Kitchen', 'Parking'],
+      phone: '+255678901234',
       featured: true
     },
     {
@@ -48,6 +51,7 @@ const FeaturedProperties = () => {
       reviews: 203,
       image: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=500&h=400&fit=crop',
       amenities: ['WiFi', 'Parking', 'Kitchen'],
+      phone: '+255787654321',
       featured: true
     }
   ];
@@ -124,10 +128,22 @@ const FeaturedProperties = () => {
                         TSh {property.price.toLocaleString()}
                       </span>
                       <span className="text-muted-foreground text-sm">/mwezi</span>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {property.reviews} maoni
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground">
-                      {property.reviews} maoni
-                    </div>
+                    {property.phone && (
+                      <a
+                        href={`https://wa.me/${property.phone.replace(/[^0-9]/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-full text-xs transition-colors"
+                      >
+                        <span className="mr-1">📱</span>
+                        Piga
+                      </a>
+                    )}
                   </div>
                 </CardContent>
               </Card>
