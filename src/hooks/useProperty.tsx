@@ -16,10 +16,9 @@ export const useProperty = (id: string | undefined) => {
         .from('properties')
         .select(`
           *,
-          profiles!inner(full_name, phone)
+          profiles!fk_landlord_profile(full_name, phone)
         `)
         .eq('id', id)
-        .eq('profiles.user_id', 'landlord_id')
         .maybeSingle();
 
       if (error) {
