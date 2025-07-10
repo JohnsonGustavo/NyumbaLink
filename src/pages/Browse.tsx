@@ -379,24 +379,13 @@ const Browse = () => {
 
   // Filter properties based on search criteria
   const filteredProperties = allProperties.filter(property => {
-    // Enhanced location filtering to handle city names better
+    // Location filtering - show properties from specific city
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+      const query = searchQuery.toLowerCase().trim();
       const location = property.location.toLowerCase();
       
-      // Check if location contains the query or if query is a major city that matches
-      const cityMatches = (
-        location.includes(query) ||
-        (query.includes('dar es salaam') && location.includes('dar es salaam')) ||
-        (query.includes('dar') && location.includes('dar es salaam')) ||
-        (query.includes('mbeya') && location.includes('mbeya')) ||
-        (query.includes('arusha') && location.includes('arusha')) ||
-        (query.includes('mwanza') && location.includes('mwanza')) ||
-        (query.includes('dodoma') && location.includes('dodoma')) ||
-        (query.includes('zanzibar') && location.includes('zanzibar'))
-      );
-      
-      if (!cityMatches) {
+      // Direct match for the location
+      if (!location.includes(query)) {
         return false;
       }
     }
