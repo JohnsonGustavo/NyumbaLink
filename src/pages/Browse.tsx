@@ -483,7 +483,7 @@ const Browse = () => {
                 price={Number(property.price)}
                 location={property.location}
                 images={property.images || []}
-                phone={(property.profiles as any)?.phone}
+                phone={property.profiles?.phone || undefined}
                 isFavorited={favoriteIds.includes(property.id)}
                 onToggleFavorite={handleToggleFavorite}
                 viewMode={viewMode}

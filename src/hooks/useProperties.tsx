@@ -3,12 +3,19 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { Tables } from '@/integrations/supabase/types';
 
-export type Property = Tables<'properties'>;
+export type Property = Tables<'properties'> & {
+  profiles?: {
+    full_name: string | null;
+    phone: string | null;
+  };
+};
 
 export const useProperties = () => {
   return useQuery({
     queryKey: ['properties'],
     queryFn: async () => {
+      console.log('Fetching properties...');
+      
       const { data, error } = await supabase
         .from('properties')
         .select(`
@@ -26,7 +33,8 @@ export const useProperties = () => {
         throw error;
       }
 
-      return data;
+      console.log('Properties fetched successfully:', data);
+      return data as Property[];
     },
   });
 };
