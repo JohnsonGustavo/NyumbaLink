@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,10 +9,12 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Eye, EyeOff, Home, Check } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const SignUp = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -23,8 +25,16 @@ const SignUp = () => {
     agreeToTerms: false
   });
   const navigate = useNavigate();
+  const { signUp, user, loading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
@@ -37,10 +47,28 @@ const SignUp = () => {
       return;
     }
 
-    console.log('Sign up:', formData);
-    // Here you would integrate with Supabase Auth
-    // For now, just navigate to dashboard
-    navigate('/dashboard');
+    setIsLoading(true);
+
+    const { error } = await signUp(formData.email, formData.password, {
+      full_name: formData.fullName,
+      phone: formData.phone,
+      user_type: formData.userType
+    });
+
+    if (!error) {
+      // Don't navigate automatically - user needs to confirm email first
+      setFormData({
+        fullName: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        userType: '',
+        agreeToTerms: false
+      });
+    }
+
+    setIsLoading(false);
   };
 
   const handleInputChange = (field: string, value: any) => {
@@ -208,9 +236,9 @@ const SignUp = () => {
                 <Button 
                   type="submit" 
                   className="w-full bg-primary hover:bg-primary/90"
-                  disabled={!formData.agreeToTerms}
+                  disabled={!formData.agreeToTerms || isLoading}
                 >
-                  Jisajili
+                  {isLoading ? 'Inasubiri...' : 'Jisajili'}
                 </Button>
               </form>
 

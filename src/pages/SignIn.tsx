@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Eye, EyeOff, Home } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -15,14 +16,28 @@ const SignIn = () => {
     email: '',
     password: ''
   });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { signIn, user, loading } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, loading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Sign in:', formData);
-    // Here you would integrate with Supabase Auth
-    // For now, just navigate to dashboard
-    navigate('/dashboard');
+    setIsLoading(true);
+    
+    const { error } = await signIn(formData.email, formData.password);
+    
+    if (!error) {
+      navigate('/', { replace: true });
+    }
+    
+    setIsLoading(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -109,8 +124,9 @@ const SignIn = () => {
                 <Button 
                   type="submit" 
                   className="w-full bg-primary hover:bg-primary/90"
+                  disabled={isLoading}
                 >
-                  Ingia
+                  {isLoading ? 'Inasubiri...' : 'Ingia'}
                 </Button>
               </form>
 

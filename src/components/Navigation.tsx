@@ -35,7 +35,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Search, User, Menu, X, Globe, Heart, Building2 } from 'lucide-react';
+import { Home, Search, User, Menu, X, Globe, Heart, Building2, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 /**
  * Global Navigation Component
@@ -53,6 +54,7 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // Mobile menu visibility
   const [language, setLanguage] = useState('sw'); // Current language (Swahili default)
   const location = useLocation(); // Current page location for active states
+  const { user, signOut } = useAuth(); // Authentication state
 
   /**
    * Translation Configuration / Mipangilio ya Tafsiri
@@ -71,6 +73,7 @@ const Navigation = () => {
       favorites: 'Favorites',
       signIn: 'Sign In',
       signUp: 'Sign Up',
+      signOut: 'Sign Out',
       language: 'Language',
       becomeHost: 'Become a Host'
     },
@@ -81,6 +84,7 @@ const Navigation = () => {
       favorites: 'Pendwa',
       signIn: 'Ingia',
       signUp: 'Jisajili',
+      signOut: 'Toka',
       language: 'Lugha',
       becomeHost: 'Kuwa Mwenye Nyumba'
     }
@@ -171,14 +175,29 @@ const Navigation = () => {
             </Button>
 
             {/* User Account Menu - Menyu ya akaunti ya mtumiaji */}
-            <div className="flex items-center border rounded-full p-1 hover:shadow-md transition-shadow cursor-pointer">
-              <Button variant="ghost" size="sm" className="p-2">
-                <Menu className="h-4 w-4" />
+            {user ? (
+              <Button
+                variant="ghost"
+                onClick={signOut}
+                className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>{t.signOut}</span>
               </Button>
-              <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center ml-1">
-                <User className="h-4 w-4 text-white" />
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link to="/signin">
+                  <Button variant="ghost" size="sm">
+                    {t.signIn}
+                  </Button>
+                </Link>
+                <Link to="/signup">
+                  <Button size="sm" className="bg-primary hover:bg-primary/90">
+                    {t.signUp}
+                  </Button>
+                </Link>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Mobile Menu Toggle Button - Kitufe cha menyu ya simu */}
