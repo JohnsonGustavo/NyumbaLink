@@ -160,14 +160,25 @@ const Navigation = () => {
 
             {/* User Account Menu - Menyu ya akaunti ya mtumiaji */}
             {user ? (
-              <Button
-                variant="ghost"
-                onClick={signOut}
-                className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>{t.signOut}</span>
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Link to="/dashboard">
+                  <Button
+                    variant="ghost"
+                    className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>{t.dashboard}</span>
+                  </Button>
+                </Link>
+                <Button
+                  variant="ghost"
+                  onClick={signOut}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-gray-100"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>{t.signOut}</span>
+                </Button>
+              </div>
             ) : (
               <div className="flex items-center space-x-2">
                 <Link to="/signin">
@@ -214,6 +225,19 @@ const Navigation = () => {
               </Link>
               
               {/* Mobile Dashboard Link - Kiungo cha dashibodi kwa simu */}
+              {user && (
+                <Link
+                  to="/dashboard"
+                  className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <div className="flex items-center">
+                    <User className="h-5 w-5 mr-3 text-gray-400" />
+                    {t.dashboard}
+                  </div>
+                </Link>
+              )}
+              
               <Link
                 to="/dashboard"
                 className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
@@ -237,20 +261,33 @@ const Navigation = () => {
                   {t.language} ({language.toUpperCase()})
                 </Button>
                 
-                {/* Mobile Sign In Link - Kiungo cha kuingia kwa simu */}
-                <Link to="/signin" className="block mt-2">
-                  <Button variant="ghost" className="w-full justify-start px-4 py-3 hover:bg-gray-100 rounded-lg">
-                    <User className="h-5 w-5 mr-3 text-gray-400" />
-                    {t.signIn}
+                {user ? (
+                  <Button
+                    variant="ghost"
+                    onClick={signOut}
+                    className="w-full justify-start px-4 py-3 hover:bg-gray-100 rounded-lg mt-2"
+                  >
+                    <LogOut className="h-5 w-5 mr-3 text-gray-400" />
+                    {t.signOut}
                   </Button>
-                </Link>
-                
-                {/* Mobile Sign Up Button - Kitufe cha kujisajili kwa simu */}
-                <Link to="/signup" className="block mt-2">
-                  <Button className="w-full mt-2 bg-primary hover:bg-primary/90">
-                    {t.signUp}
-                  </Button>
-                </Link>
+                ) : (
+                  <>
+                    {/* Mobile Sign In Link - Kiungo cha kuingia kwa simu */}
+                    <Link to="/signin" className="block mt-2">
+                      <Button variant="ghost" className="w-full justify-start px-4 py-3 hover:bg-gray-100 rounded-lg">
+                        <User className="h-5 w-5 mr-3 text-gray-400" />
+                        {t.signIn}
+                      </Button>
+                    </Link>
+                    
+                    {/* Mobile Sign Up Button - Kitufe cha kujisajili kwa simu */}
+                    <Link to="/signup" className="block mt-2">
+                      <Button className="w-full mt-2 bg-primary hover:bg-primary/90">
+                        {t.signUp}
+                      </Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

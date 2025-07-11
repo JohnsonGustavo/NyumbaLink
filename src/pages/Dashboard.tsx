@@ -49,6 +49,7 @@ const Dashboard = () => {
   const [submitting, setSubmitting] = useState(false);
   const [showProfileDialog, setShowProfileDialog] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(false);
   
   // Profile state
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -84,6 +85,17 @@ const Dashboard = () => {
     if (user) {
       fetchProfile();
       fetchProperties();
+      
+      // Check if this is a new user (just signed up)
+      const userCreatedAt = new Date(user.created_at);
+      const now = new Date();
+      const timeDiff = now.getTime() - userCreatedAt.getTime();
+      const minutesDiff = timeDiff / (1000 * 60);
+      
+      // If user was created less than 5 minutes ago, consider them new
+      if (minutesDiff < 5) {
+        setIsNewUser(true);
+      }
     }
   }, [user]);
 
@@ -362,6 +374,31 @@ const Dashboard = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       
+      {/* Welcome Banner for New Users */}
+      {isNewUser && (
+        <div className="bg-gradient-to-r from-primary to-serengeti-500 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">
+                  🎉 Karibu kwenye Nyumba Link!
+                </h2>
+                <p className="text-lg opacity-90">
+                  Anza safari yako ya kuongeza nyumba zako na kupata wapangaji
+                </p>
+              </div>
+              <Button
+                variant="secondary"
+                onClick={() => setIsNewUser(false)}
+                className="bg-white text-primary hover:bg-gray-100"
+              >
+                ✕
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header with Profile Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
@@ -516,10 +553,12 @@ const Dashboard = () => {
         <div className="flex flex-col sm:flex-row gap-4 mb-8">
           <Button 
             onClick={() => setShowAddForm(true)} 
-            className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none"
+            className={`bg-primary hover:bg-primary/90 flex-1 sm:flex-none ${
+              isNewUser ? 'animate-pulse shadow-lg ring-2 ring-primary/50' : ''
+            }`}
           >
             <Plus className="h-4 w-4 mr-2" />
-            Ongeza Nyumba Mpya
+            {isNewUser ? 'Anza Kuongeza Nyumba Yako ya Kwanza!' : 'Ongeza Nyumba Mpya'}
           </Button>
           
           <Button 
@@ -803,14 +842,20 @@ const Dashboard = () => {
               <div className="text-center py-8">
                 <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  Hakuna nyumba zilizosajiliwa
+                  {isNewUser ? 'Karibu! Anza kuongeza nyumba zako' : 'Hakuna nyumba zilizosajiliwa'}
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Anza kwa kuongeza nyumba yako ya kwanza
+                  {isNewUser 
+                    ? 'Bonyeza kitufe hapo chini kuongeza nyumba yako ya kwanza na kuanza kupata wapangaji'
+                    : 'Anza kwa kuongeza nyumba yako ya kwanza'
+                  }
                 </p>
-                <Button onClick={() => setShowAddForm(true)}>
+                <Button 
+                  onClick={() => setShowAddForm(true)}
+                  className={isNewUser ? 'bg-primary hover:bg-primary/90 shadow-lg' : ''}
+                >
                   <Plus className="h-4 w-4 mr-2" />
-                  Ongeza Nyumba
+                  {isNewUser ? 'Ongeza Nyumba Yako ya Kwanza' : 'Ongeza Nyumba'}
                 </Button>
               </div>
             ) : (

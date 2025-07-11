@@ -56,7 +56,14 @@ const SignUp = () => {
     });
 
     if (!error) {
-      // Don't navigate automatically - user needs to confirm email first
+      // Navigate landlords to dashboard, tenants stay on current page
+      if (formData.userType === 'landlord') {
+        // Small delay to ensure profile is created
+        setTimeout(() => {
+          navigate('/dashboard', { replace: true });
+        }, 1000);
+      }
+      
       setFormData({
         fullName: '',
         email: '',
