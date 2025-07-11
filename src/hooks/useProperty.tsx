@@ -16,7 +16,10 @@ export const useProperty = (id: string | undefined) => {
         .from('properties')
         .select(`
           *,
-          profiles!inner(full_name, phone)
+          profiles!fk_landlord_profile (
+            full_name,
+            phone
+          )
         `)
         .eq('id', id)
         .maybeSingle();
@@ -31,7 +34,7 @@ export const useProperty = (id: string | undefined) => {
         ...data,
         profiles: Array.isArray(data?.profiles) && data.profiles.length > 0 
           ? data.profiles[0] 
-          : data?.profiles
+          : data?.profiles || null
       } as Property;
 
       console.log('Property fetched successfully:', transformedProperty);
