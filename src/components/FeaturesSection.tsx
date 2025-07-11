@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, Shield, Heart, MapPin, Zap, Users } from 'lucide-react';
