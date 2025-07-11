@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, Shield, Heart, MapPin, Zap, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const FeaturesSection = () => {
   const features = [
@@ -103,11 +104,11 @@ const FeaturesSection = () => {
               Jiunge na elfu za Watanzania wanaotumia Nyumba Link kupata nyumba zao za ndoto.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link 
-                to="/signup" 
+              <Link
+                to="/signup?type=landlord"
                 className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors inline-block text-center"
               >
-               Jisajili Kama Mwenye Nyumba
+                Jisajili Kama Mwenye Nyumba
               </Link>
               <Link 
                 to="/browse" 
