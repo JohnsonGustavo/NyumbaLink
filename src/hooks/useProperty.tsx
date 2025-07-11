@@ -16,7 +16,7 @@ export const useProperty = (id: string | undefined) => {
         .from('properties')
         .select(`
           *,
-          profiles!properties_landlord_id_fkey(full_name, phone)
+          profiles!fk_landlord_profile(full_name, phone)
         `)
         .eq('id', id)
         .maybeSingle();
