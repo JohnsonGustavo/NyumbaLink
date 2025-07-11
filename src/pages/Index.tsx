@@ -28,7 +28,6 @@ import Navigation from "@/components/Navigation";
 import HeroSection from "@/components/HeroSection";
 import PopularDestinations from "@/components/PopularDestinations";
 import FeaturedProperties from "@/components/FeaturedProperties";
-import FeaturesSection from "@/components/FeaturesSection";
 import Footer from "@/components/Footer";
 
 /**
@@ -55,9 +54,6 @@ const Index = () => {
       
       {/* Highlighted property listings - Nyumba zilizoangaziwa */}
       <FeaturedProperties />
-      
-      {/* Platform features and benefits - Vipengele na faida za jukwaa */}
-      <FeaturesSection />
       
       {/* Footer with additional information - Kichapo na maelezo ya ziada */}
       <Footer />
