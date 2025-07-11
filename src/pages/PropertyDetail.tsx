@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { useProperty } from '@/hooks/useProperty';
 import { 
   ArrowLeft, 
   Heart, 
@@ -21,8 +20,7 @@ import {
   Mail,
   User,
   ChevronLeft,
-  ChevronRight,
-  Loader2
+  ChevronRight
 } from 'lucide-react';
 
 const PropertyDetail = () => {
@@ -31,7 +29,44 @@ const PropertyDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
 
-  const { data: property, isLoading, error } = useProperty(id);
+  // Sample property data (in real app, this would come from API)
+  const property = {
+    id: id,
+    title: 'Nyumba ya Kisasa Mikocheni',
+    description: 'Nyumba nzuri ya vyumba 3 na jiko la kisasa. Ina bustani ndogo na nafasi ya gari. Mazingira mazuri na usalama wa juu. Nyumba hii ina vyumba 3 vya kulala, sebule kubwa, jiko la kisasa, na choo 2. Kuna bustani ndogo nyuma ya nyumba na nafasi ya gari mbele. Eneo ni salama na lina usalama wa usiku na mchana.',
+    price: 800000,
+    location: 'Mikocheni, Dar es Salaam',
+    fullAddress: 'Barabara ya Mikocheni, Klabu ya Mikocheni, Dar es Salaam, Tanzania',
+    images: [
+      'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=800&h=600&fit=crop',
+      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=600&fit=crop',
+    ],
+    utilities: { electricity: true, water: true },
+    nearbyServices: ['school', 'hospital', 'market'],
+    landlord: { 
+      name: 'Mwalimu John Mwangi', 
+      phone: '+255712345678', 
+      email: 'john.mwangi@example.com',
+      verified: true
+    },
+    features: [
+      'Vyumba 3 vya kulala',
+      'Sebule kubwa',
+      'Jiko la kisasa',
+      'Choo 2',
+      'Bustani ndogo',
+      'Nafasi ya gari',
+      'Usalama wa juu',
+      'Mazingira mazuri'
+    ],
+    rules: [
+      'Hakuna paka au mbwa',
+      'Hakuna kelele za ziada baada ya saa 10 jioni',
+      'Malipo ya kodi yawe mapema kila mwezi',
+      'Mazingira yawe safi kila wakati'
+    ]
+  };
 
   const serviceIcons = {
     school: { icon: School, label: 'Shule' },
@@ -39,57 +74,15 @@ const PropertyDetail = () => {
     market: { icon: ShoppingCart, label: 'Soko' }
   };
 
-  // Handle loading and error states
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="flex justify-center items-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-gray-600">Inapakia nyumba...</span>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Nyumba haijapatikana
-            </h2>
-            <p className="text-gray-600 mb-8">
-              Nyumba uliyotafuta haijapatikana au imefutwa.
-            </p>
-            <Button onClick={() => navigate('/browse')}>
-              Rudi kwenye Nyumba Zote
-            </Button>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  if (!property) {
-    return null;
-  }
-
   const nextImage = () => {
     setCurrentImageIndex((prev) => 
-      prev === (property.images?.length ?? 1) - 1 ? 0 : prev + 1
+      prev === property.images.length - 1 ? 0 : prev + 1
     );
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prev) => 
-      prev === 0 ? (property.images?.length ?? 1) - 1 : prev - 1
+      prev === 0 ? property.images.length - 1 : prev - 1
     );
   };
 
@@ -116,13 +109,13 @@ const PropertyDetail = () => {
               <CardContent className="p-0">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-t-lg">
                   <img
-                    src={property.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop'}
+                    src={property.images[currentImageIndex]}
                     alt={property.title}
                     className="w-full h-full object-cover"
                   />
                   
                   {/* Navigation arrows */}
-                  {property.images && property.images.length > 1 && (
+                  {property.images.length > 1 && (
                     <>
                       <Button
                         variant="ghost"
@@ -145,7 +138,7 @@ const PropertyDetail = () => {
 
                   {/* Image counter */}
                   <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                    {currentImageIndex + 1} / {property.images?.length ?? 1}
+                    {currentImageIndex + 1} / {property.images.length}
                   </div>
 
                   {/* Action buttons */}
@@ -171,7 +164,7 @@ const PropertyDetail = () => {
                 </div>
 
                 {/* Image thumbnails */}
-                {property.images && property.images.length > 1 && (
+                {property.images.length > 1 && (
                   <div className="p-4 flex space-x-2 overflow-x-auto">
                     {property.images.map((image, index) => (
                       <button
@@ -207,7 +200,7 @@ const PropertyDetail = () => {
                       </h1>
                       <div className="text-right">
                         <div className="text-3xl font-bold text-primary">
-                          TZS {Number(property.price).toLocaleString()}
+                          TZS {property.price.toLocaleString()}
                         </div>
                         <div className="text-gray-600">kwa mwezi</div>
                       </div>
@@ -215,24 +208,24 @@ const PropertyDetail = () => {
                     
                     <div className="flex items-center text-gray-600 mb-4">
                       <MapPin className="h-5 w-5 mr-2" />
-                      <span>{property.full_address || property.location}</span>
+                      <span>{property.fullAddress}</span>
                     </div>
 
                     {/* Utilities and services */}
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {property.electricity && (
+                      {property.utilities.electricity && (
                         <Badge className="bg-green-100 text-green-800">
                           <Zap className="h-3 w-3 mr-1" />
                           Umeme
                         </Badge>
                       )}
-                      {property.water && (
+                      {property.utilities.water && (
                         <Badge className="bg-blue-100 text-blue-800">
                           <Droplets className="h-3 w-3 mr-1" />
                           Maji
                         </Badge>
                       )}
-                      {property.nearby_services?.map((service) => {
+                      {property.nearbyServices.map((service) => {
                         const serviceInfo = serviceIcons[service as keyof typeof serviceIcons];
                         if (!serviceInfo) return null;
                         const { icon: ServiceIcon, label } = serviceInfo;
@@ -262,57 +255,29 @@ const PropertyDetail = () => {
                   <div>
                     <h3 className="text-xl font-semibold mb-3">Vipengele</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {property.bedrooms && (
-                        <div className="flex items-center">
+                      {property.features.map((feature, index) => (
+                        <div key={index} className="flex items-center">
                           <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
-                          <span className="text-gray-700">Vyumba {property.bedrooms} vya kulala</span>
+                          <span className="text-gray-700">{feature}</span>
                         </div>
-                      )}
-                      {property.bathrooms && (
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
-                          <span className="text-gray-700">Choo {property.bathrooms}</span>
-                        </div>
-                      )}
-                      {property.area_sqm && (
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
-                          <span className="text-gray-700">Eneo: {property.area_sqm} m²</span>
-                        </div>
-                      )}
-                      {property.furnished && (
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
-                          <span className="text-gray-700">Vifaa vipo</span>
-                        </div>
-                      )}
-                      {property.parking && (
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
-                          <span className="text-gray-700">Nafasi ya gari</span>
-                        </div>
-                      )}
-                      {property.security && (
-                        <div className="flex items-center">
-                          <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
-                          <span className="text-gray-700">Usalama 24/7</span>
-                        </div>
-                      )}
+                      ))}
                     </div>
                   </div>
 
                   <Separator />
 
-                  {/* Property type */}
-                  {property.property_type && (
-                    <>
-                      <div>
-                        <h3 className="text-xl font-semibold mb-3">Aina ya Nyumba</h3>
-                        <p className="text-gray-700 capitalize">{property.property_type}</p>
-                      </div>
-                      <Separator />
-                    </>
-                  )}
+                  {/* Rules */}
+                  <div>
+                    <h3 className="text-xl font-semibold mb-3">Sheria za Nyumba</h3>
+                    <div className="space-y-2">
+                      {property.rules.map((rule, index) => (
+                        <div key={index} className="flex items-start">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full mr-3 mt-2"></div>
+                          <span className="text-gray-700">{rule}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -333,10 +298,12 @@ const PropertyDetail = () => {
                     </div>
                     <div>
                       <div className="font-semibold text-gray-900">
-                        {property.profiles?.full_name || 'Mwenye Nyumba'}
-                        <Badge className="ml-2 bg-green-100 text-green-800">
-                          Verified
-                        </Badge>
+                        {property.landlord.name}
+                        {property.landlord.verified && (
+                          <Badge className="ml-2 bg-green-100 text-green-800">
+                            Verified
+                          </Badge>
+                        )}
                       </div>
                       <div className="text-sm text-gray-600">Mwenye Nyumba</div>
                     </div>
@@ -346,23 +313,19 @@ const PropertyDetail = () => {
 
                   {/* Contact options */}
                   <div className="space-y-3">
-                    {property.profiles?.phone && (
-                      <Button className="w-full bg-primary hover:bg-primary/90">
-                        <Phone className="h-4 w-4 mr-2" />
-                        Piga Simu: {property.profiles.phone}
-                      </Button>
-                    )}
-                    {property.profiles?.phone && (
-                      <Button 
-                        className="w-full bg-green-600 hover:bg-green-700 text-white"
-                        onClick={() => window.open(`https://wa.me/${property.profiles?.phone?.replace(/[^0-9]/g, '')}?text=Hujambo, ninapenda kujua zaidi kuhusu nyumba hii: ${property.title}`, '_blank')}
-                      >
-                        <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
-                        </svg>
-                        WhatsApp: {property.profiles.phone}
-                      </Button>
-                    )}
+                    <Button className="w-full bg-primary hover:bg-primary/90">
+                      <Phone className="h-4 w-4 mr-2" />
+                      Piga Simu: {property.landlord.phone}
+                    </Button>
+                    <Button 
+                      className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => window.open(`https://wa.me/${property.landlord.phone.replace(/[^0-9]/g, '')}?text=Hujambo, ninapenda kujua zaidi kuhusu nyumba hii: ${property.title}`, '_blank')}
+                    >
+                      <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                      </svg>
+                      WhatsApp: {property.landlord.phone}
+                    </Button>
                     <Button variant="outline" className="w-full">
                       <Mail className="h-4 w-4 mr-2" />
                       Tuma Barua Pepe
