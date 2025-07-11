@@ -10,11 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Eye, EyeOff, Home, Check } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
 
 const SignUp = () => {
   const [searchParams] = useSearchParams();
-  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,20 +40,12 @@ const SignUp = () => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Hitilafu",
-        description: "Nywila hazifanani"
-      });
+      alert('Nywila hazifanani');
       return;
     }
 
     if (!formData.agreeToTerms) {
-      toast({
-        variant: "destructive",
-        title: "Hitilafu", 
-        description: "Unalazimika kukubali masharti na taratibu"
-      });
+      alert('Unalazimika kukubali masharti na taratibu');
       return;
     }
 
@@ -68,11 +58,13 @@ const SignUp = () => {
     });
 
     if (!error) {
-      // All users are landlords, so always redirect to dashboard
-      // Small delay to ensure profile is created
-      setTimeout(() => {
-        navigate('/dashboard', { replace: true });
-      }, 1000);
+      // Navigate landlords to dashboard, tenants stay on current page
+      if (formData.userType === 'landlord') {
+        // Small delay to ensure profile is created
+        setTimeout(() => {
+          navigate('/dashboard', { replace: true });
+        }, 1000);
+      }
       
       setFormData({
         fullName: '',
@@ -80,7 +72,7 @@ const SignUp = () => {
         phone: '',
         password: '',
         confirmPassword: '',
-        userType: 'landlord',
+        userType: '',
         agreeToTerms: false
       });
     }
@@ -261,13 +253,13 @@ const SignUp = () => {
           <div className="bg-blue-50 rounded-lg p-4">
             <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
               <Check className="h-4 w-4 mr-2" />
-              Faida za kuwa mwenye nyumba:
+              {isFromHomepage ? 'Faida za kuwa mpangisha:' : 'Faida za kuwa mwenye nyumba:'}
             </h3>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Tangaza nyumba zako kwa bure</li>
-              <li>• Pata wapangaji wa haraka</li>
+              <li>• {isFromHomepage ? 'Pata wateja wa haraka' : 'Pata wapangaji wa haraka'}</li>
               <li>• Simamia matangazo yako kwa urahisi</li>
-              <li>• Wasiliana na wapangaji moja kwa moja</li>
+              <li>• {isFromHomepage ? 'Wasiliana na wateja moja kwa moja' : 'Wasiliana na wapangaji moja kwa moja'}</li>
               <li>• Pata takwimu za matangazo yako</li>
             </ul>
           </div>
