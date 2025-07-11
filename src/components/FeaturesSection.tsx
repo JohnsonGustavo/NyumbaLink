@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Search, Shield, Heart, MapPin, Zap, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 
 const FeaturesSection = () => {
   const features = [
