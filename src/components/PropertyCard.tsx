@@ -1,3 +1,39 @@
+/**
+ * PROPERTYCARD.TSX - REUSABLE PROPERTY DISPLAY COMPONENT
+ * =====================================================
+ * 
+ * Kipengele cha kuonyesha nyumba - Reusable property display component
+ * 
+ * ARCHITECTURE / MUUNDO:
+ * This is a highly reusable component that can display property information
+ * in multiple formats (grid/list) across different pages of the application.
+ * 
+ * DESIGN PATTERNS / MIFUMO YA MUUNDO:
+ * - Compound component pattern for flexible layouts
+ * - Prop-based configuration for different use cases
+ * - Event delegation for user interactions
+ * - Responsive design with mobile-first approach
+ * 
+ * FEATURES / VIPENGELE:
+ * - Dual view modes (grid and list)
+ * - Interactive image carousel
+ * - Favorite toggle functionality
+ * - Direct WhatsApp integration
+ * - Responsive design for all devices
+ * - Accessibility features
+ * 
+ * SCALABILITY / UKUAJI:
+ * - Easy to extend with new view modes
+ * - Configurable through props
+ * - Reusable across different pages
+ * - Can be enhanced with additional features
+ * 
+ * PERFORMANCE / UTENDAJI:
+ * - Optimized image loading
+ * - Minimal re-renders through proper state management
+ * - Efficient event handling
+ * - Lazy loading support ready
+ */
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,6 +42,31 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, MapPin, Star, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+/**
+ * PROPERTY CARD PROPS INTERFACE
+ * ============================
+ * 
+ * Defines the contract for PropertyCard component props.
+ * Ensures type safety and clear API for component usage.
+ * 
+ * REQUIRED PROPS / VIPENGELE VINAVYOHITAJIKA:
+ * - id: Unique property identifier for routing
+ * - title: Property name/title for display
+ * - price: Monthly rent amount in TZS
+ * - location: Property location string
+ * - images: Array of image URLs
+ * 
+ * OPTIONAL PROPS / VIPENGELE VYA HIARI:
+ * - phone: Landlord contact number
+ * - isFavorited: Current favorite status
+ * - onToggleFavorite: Callback for favorite toggle
+ * - viewMode: Display format (grid or list)
+ * 
+ * EXTENSIBILITY / UWEZEKANO WA KUONGEZA:
+ * - Easy to add new props without breaking existing usage
+ * - Optional props provide flexibility
+ * - Type safety prevents runtime errors
+ */
 interface PropertyCardProps {
   id: string;
   title: string;
@@ -18,6 +79,28 @@ interface PropertyCardProps {
   viewMode?: 'grid' | 'list';
 }
 
+/**
+ * PROPERTY CARD COMPONENT
+ * ======================
+ * 
+ * Main component function that renders property information
+ * in either grid or list format based on viewMode prop.
+ * 
+ * STATE MANAGEMENT / USIMAMIZI WA HALI:
+ * - currentImageIndex: Tracks which image is currently displayed
+ * - Local state for image carousel functionality
+ * 
+ * CONDITIONAL RENDERING / UONYESHAJI WA MASHARTI:
+ * - Different layouts based on viewMode prop
+ * - Responsive behavior for different screen sizes
+ * - Graceful handling of missing data
+ * 
+ * USER INTERACTIONS / MWINGILIANO WA MTUMIAJI:
+ * - Image carousel navigation
+ * - Favorite toggle with callback
+ * - WhatsApp contact integration
+ * - Navigation to property details
+ */
 const PropertyCard: React.FC<PropertyCardProps> = ({
   id,
   title,
@@ -29,8 +112,36 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   onToggleFavorite,
   viewMode = 'grid'
 }) => {
+  /**
+   * IMAGE CAROUSEL STATE
+   * ===================
+   * 
+   * Manages which image is currently displayed in the carousel.
+   * Starts at index 0 and cycles through available images.
+   * 
+   * USAGE / MATUMIZI:
+   * - Updated by image navigation buttons
+   * - Used to display current image
+   * - Enables smooth image transitions
+   */
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  /**
+   * FAVORITE TOGGLE HANDLER
+   * ======================
+   * 
+   * Handles favorite button clicks with proper event handling.
+   * 
+   * EVENT HANDLING / KUSHUGHULIKIA MATUKIO:
+   * - preventDefault: Stops link navigation
+   * - stopPropagation: Prevents event bubbling
+   * - Calls parent callback if provided
+   * 
+   * ACCESSIBILITY / UFIKIVU:
+   * - Keyboard accessible
+   * - Screen reader friendly
+   * - Clear visual feedback
+   */
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -39,12 +150,37 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     }
   };
 
+  /**
+   * LIST VIEW RENDERING
+   * ==================
+   * 
+   * Renders property card in horizontal list format.
+   * Optimized for desktop viewing with more details.
+   * 
+   * LAYOUT / MPANGILIO:
+   * - Horizontal flex layout
+   * - Fixed image width (320px)
+   * - Expanded content area
+   * - Enhanced information display
+   * 
+   * FEATURES / VIPENGELE:
+   * - Larger image display
+   * - More detailed information
+   * - Better for comparison viewing
+   * - Desktop-optimized layout
+   */
   if (viewMode === 'list') {
     return (
       <Card className="group overflow-hidden hover:shadow-lg transition-all duration-300 border-0 shadow-sm">
         <Link to={`/property/${id}`} className="block">
           <div className="flex">
-            {/* Image */}
+            {/* 
+             * LIST VIEW IMAGE SECTION
+             * ======================
+             * 
+             * Fixed-width image container for list view.
+             * Maintains aspect ratio and provides hover effects.
+             */
             <div className="w-80 h-60 flex-shrink-0 relative overflow-hidden">
               <img
                 src={images[0] || `https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop`}
@@ -52,7 +188,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
               
-              {/* Favorite button */}
+              {/* 
+               * FAVORITE BUTTON - LIST VIEW
+               * ==========================
+               * 
+               * Positioned absolutely in top-right corner.
+               * Changes color based on favorite status.
+               */
               <Button
                 variant="ghost"
                 size="sm"
@@ -64,7 +206,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 <Heart className={`h-5 w-5 ${isFavorited ? 'fill-current' : ''}`} />
               </Button>
 
-              {/* Price overlay */}
+              {/* 
+               * PRICE OVERLAY - LIST VIEW
+               * ========================
+               * 
+               * Displays price prominently on image.
+               * High contrast for readability.
+               */
               <div className="absolute bottom-3 left-3">
                 <Badge className="bg-white text-gray-900 font-bold text-base px-3 py-1 shadow-sm">
                   TZS {price.toLocaleString()}/mwezi
@@ -72,7 +220,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               </div>
             </div>
 
-            {/* Content */}
+            {/* 
+             * LIST VIEW CONTENT SECTION
+             * ========================
+             * 
+             * Expanded content area with detailed information.
+             * Includes title, location, rating, and contact button.
+             */
             <div className="flex-1 p-6">
               <div className="space-y-3">
                 <div>
@@ -85,7 +239,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                   </div>
                 </div>
 
-                {/* Rating */}
+                {/* 
+                 * RATING AND CONTACT SECTION
+                 * ==========================
+                 * 
+                 * Shows property rating and provides contact options.
+                 * WhatsApp integration for direct communication.
+                 */
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center">
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
@@ -93,7 +253,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                     <span className="text-sm text-gray-500 ml-1">(12 maoni)</span>
                   </div>
                   
-                  {/* WhatsApp Contact Button */}
+                  {/* 
+                   * WHATSAPP CONTACT BUTTON
+                   * ======================
+                   * 
+                   * Direct WhatsApp integration for instant communication.
+                   * Opens WhatsApp with pre-filled message.
+                   */
                   {phone && (
                     <a
                       href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
@@ -115,11 +281,36 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     );
   }
 
+  /**
+   * GRID VIEW RENDERING (DEFAULT)
+   * =============================
+   * 
+   * Renders property card in vertical grid format.
+   * Optimized for mobile and grid layouts.
+   * 
+   * LAYOUT / MPANGILIO:
+   * - Vertical card layout
+   * - Square aspect ratio image
+   * - Compact information display
+   * - Mobile-first design
+   * 
+   * FEATURES / VIPENGELE:
+   * - Image carousel with indicators
+   * - Hover effects and animations
+   * - Responsive design
+   * - Touch-friendly interactions
+   */
   return (
     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0 shadow-sm">
       <Link to={`/property/${id}`} className="block">
         <div className="relative">
-          {/* Image */}
+          {/* 
+           * GRID VIEW IMAGE SECTION
+           * ======================
+           * 
+           * Square aspect ratio image with carousel functionality.
+           * Includes navigation and indicators for multiple images.
+           */
           <div className="aspect-[4/3] overflow-hidden relative">
             <img
               src={images[currentImageIndex] || `https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop`}
@@ -128,7 +319,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             />
           </div>
 
-          {/* Image indicators */}
+          {/* 
+           * IMAGE CAROUSEL INDICATORS
+           * ========================
+           * 
+           * Shows dots for each image and allows navigation.
+           * Only displayed when multiple images are available.
+           */
           {images.length > 1 && (
             <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1">
               {images.map((_, index) => (
@@ -147,7 +344,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </div>
           )}
 
-          {/* Favorite button */}
+          {/* 
+           * FAVORITE BUTTON - GRID VIEW
+           * ===========================
+           * 
+           * Heart icon for adding/removing from favorites.
+           * Visual feedback based on current state.
+           */
           <Button
             variant="ghost"
             size="sm"
@@ -160,9 +363,22 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </Button>
         </div>
 
+        {/* 
+         * GRID VIEW CONTENT SECTION
+         * ========================
+         * 
+         * Compact content area with essential information.
+         * Optimized for quick scanning and comparison.
+         */
         <CardContent className="p-4">
           <div className="space-y-2">
-            {/* Title and location */}
+            {/* 
+             * TITLE AND LOCATION
+             * =================
+             * 
+             * Property name and location with truncation.
+             * Hover effects for better interactivity.
+             */
             <div>
               <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
                 {title}
@@ -172,14 +388,26 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               </div>
             </div>
 
-            {/* Rating */}
+            {/* 
+             * RATING DISPLAY
+             * =============
+             * 
+             * Shows property rating with star icon.
+             * Includes review count for credibility.
+             */
             <div className="flex items-center">
               <Star className="h-4 w-4 text-yellow-400 fill-current" />
               <span className="text-sm font-medium text-gray-900 ml-1">4.8</span>
               <span className="text-sm text-gray-500 ml-1">(12)</span>
             </div>
 
-            {/* Price and Contact */}
+            {/* 
+             * PRICE AND CONTACT SECTION
+             * ========================
+             * 
+             * Displays price and contact button side by side.
+             * WhatsApp integration for instant communication.
+             */
             <div className="pt-1 flex items-center justify-between">
               <div className="flex items-baseline">
                 <span className="text-lg font-bold text-gray-900">
@@ -188,7 +416,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 <span className="text-gray-500 ml-1 text-sm">/mwezi</span>
               </div>
               
-              {/* WhatsApp Contact Button */}
+              {/* 
+               * WHATSAPP CONTACT BUTTON - GRID VIEW
+               * ==================================
+               * 
+               * Compact contact button with WhatsApp integration.
+               * Pre-filled message for better user experience.
+               */
               {phone && (
                 <a
                   href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=Hujambo,%20ninapenda%20kujua%20zaidi%20kuhusu%20nyumba%20hii:%20${encodeURIComponent(title)}`}

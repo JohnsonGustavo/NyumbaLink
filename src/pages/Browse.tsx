@@ -4,6 +4,18 @@
  * 
  * Ukurasa wa kutazama na kutafuta nyumba - Property browsing and search page
  * 
+ * ARCHITECTURE OVERVIEW / MUHTASARI WA MUUNDO:
+ * This is the main property discovery page that handles complex filtering,
+ * search functionality, and property display. It serves as the primary
+ * interface for users to find properties that match their criteria.
+ * 
+ * DESIGN PATTERNS / MIFUMO YA MUUNDO:
+ * - URL-driven state management for shareable searches
+ * - Compound filtering with multiple criteria
+ * - Responsive grid/list view switching
+ * - Real-time search with debouncing (can be added)
+ * - Infinite scroll ready architecture
+ * 
  * MAIN FUNCTIONALITY / KAZI KEKUU:
  * - Display all available properties (Kuonyesha nyumba zote zinazopatikana)
  * - Advanced filtering by location, price, utilities (Vichujio vya kirefu vya eneo, bei, huduma)
@@ -12,11 +24,24 @@
  * - Grid and list view modes (Hali za kuona kama gridi na orodha)
  * - Favorites management (Usimamizi wa vipendwa)
  * 
+ * PERFORMANCE CONSIDERATIONS / MAMBO YA UTENDAJI:
+ * - Efficient filtering algorithms for large datasets
+ * - Memoized filter functions (can be optimized)
+ * - Lazy loading for images
+ * - Virtual scrolling for large lists (future enhancement)
+ * - Debounced search input (can be added)
+ * 
  * DATA FLOW / MTIRIRIKO WA DATA:
  * 1. Receives URL parameters from HeroSection or PopularDestinations
  * 2. Filters properties based on search criteria
  * 3. Displays filtered results with pagination
  * 4. Allows users to save favorites and navigate to property details
+ * 
+ * STATE MANAGEMENT STRATEGY / MKAKATI WA USIMAMIZI WA HALI:
+ * - URL parameters for shareable state
+ * - Local state for UI interactions
+ * - React Query for server state
+ * - Context for global favorites (can be added)
  * 
  * COMPONENT INTERACTIONS / MWINGILIANO WA VIPENGELE:
  * - Receives search params from: HeroSection, PopularDestinations
@@ -24,12 +49,26 @@
  * - Uses: PropertyCard component for display
  * - Manages: Favorites state across the application
  * 
+ * ACCESSIBILITY FEATURES / VIPENGELE VYA UFIKIVU:
+ * - Keyboard navigation support
+ * - Screen reader friendly labels
+ * - High contrast design
+ * - Focus management
+ * - ARIA labels for complex interactions
+ * 
  * FILTERING LOGIC / MANTIKI YA KUCHUJA:
  * - Location: Partial matching for city names and areas
  * - Price: Range filtering with min/max values
  * - Utilities: Multiple selection (electricity, water)
  * - Services: Multiple selection (schools, hospitals, markets)
  * - Sorting: By price, date, relevance
+ * 
+ * SCALABILITY ENHANCEMENTS / MABORESHO YA UKUAJI:
+ * - Can be extended with saved searches
+ * - Map view integration ready
+ * - Advanced filters (property type, size, etc.)
+ * - Recommendation engine integration
+ * - Social features (sharing, reviews)
  */
 
 import React, { useState, useEffect } from 'react';

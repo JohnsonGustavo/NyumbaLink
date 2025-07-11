@@ -11,6 +11,22 @@
  * - Provides global context providers (Inatoa huduma za kimsingi)
  * - Manages application-wide state (Inasimamia hali ya programu nzima)
  * 
+ * ARCHITECTURE OVERVIEW / MUHTASARI WA MUUNDO:
+ * This is the root component that orchestrates the entire application.
+ * It follows a provider pattern to inject dependencies and manages
+ * global application state through context providers.
+ * 
+ * SCALABILITY CONSIDERATIONS / MAMBO YA UKUAJI:
+ * - Error boundaries prevent app crashes from component failures
+ * - Query client enables efficient data caching and synchronization
+ * - Modular routing allows easy addition of new pages
+ * - Context providers can be extended for additional global state
+ * 
+ * PERFORMANCE OPTIMIZATIONS / MABORESHO YA UTENDAJI:
+ * - React Query handles automatic caching and background updates
+ * - Tooltip provider reduces re-renders through context optimization
+ * - Error boundaries isolate failures to prevent cascade effects
+ * 
  * COMPONENTS INCLUDED / VIPENGELE VILIVYOMO:
  * - QueryClient: For API data management (Kwa usimamizi wa data ya API)
  * - TooltipProvider: For tooltips across the app (Kwa vidokezo vyote)
@@ -26,6 +42,12 @@
  * - /signin : Login page (Ukurasa wa kuingia)
  * - /signup : Registration page (Ukurasa wa kusajili)
  * - /* : 404 page for unknown routes (Ukurasa wa makosa kwa njia zisizojulikana)
+ * 
+ * FUTURE EXTENSIBILITY / UWEZEKANO WA KUONGEZA:
+ * - Additional routes can be added easily to the Routes component
+ * - New context providers can be wrapped around existing ones
+ * - Error boundaries can be made more granular for specific features
+ * - Query client configuration can be extended for advanced caching strategies
  */
 
 import { Toaster } from "@/components/ui/toaster";
@@ -44,8 +66,30 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 
-// Initialize React Query client for API state management
-// Kuanzisha mteja wa React Query kwa usimamizi wa hali ya API
+/**
+ * REACT QUERY CLIENT CONFIGURATION
+ * ================================
+ * 
+ * Initialize React Query client for API state management
+ * Kuanzisha mteja wa React Query kwa usimamizi wa hali ya API
+ * 
+ * FEATURES / VIPENGELE:
+ * - Automatic background refetching
+ * - Intelligent caching with stale-while-revalidate
+ * - Error retry logic with exponential backoff
+ * - Optimistic updates for better UX
+ * 
+ * CONFIGURATION OPTIONS / CHAGUO ZA MIPANGILIO:
+ * - staleTime: How long data stays fresh (default: 0)
+ * - cacheTime: How long unused data stays in cache (default: 5 minutes)
+ * - retry: Number of retry attempts on failure (default: 3)
+ * - refetchOnWindowFocus: Refetch when window regains focus (default: true)
+ * 
+ * SCALABILITY / UKUAJI:
+ * - Can be configured with custom defaults for different query types
+ * - Supports query invalidation for real-time updates
+ * - Enables offline-first architecture with proper configuration
+ */
 const queryClient = new QueryClient();
 
 /**
