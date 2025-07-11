@@ -23,6 +23,7 @@ const SignUp = () => {
     password: '',
     confirmPassword: '',
     userType: searchParams.get('type') === 'landlord' ? 'landlord' : '',
+    userType: 'landlord', // Always landlord since only landlords register
     agreeToTerms: false
   });
   const navigate = useNavigate();
@@ -95,25 +96,12 @@ const SignUp = () => {
               <Home className="h-8 w-8 text-primary" />
               <span className="text-2xl font-bold text-primary">Nyumba Link</span>
             </Link>
-            {searchParams.get('type') === 'landlord' ? (
-              <>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  Kuwa Mwenye Nyumba
-                </h2>
-                <p className="mt-2 text-gray-600">
-                  Jisajili na uanze kutangaza nyumba zako leo
-                </p>
-              </>
-            ) : (
-              <>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  Jiunge na Nyumba Link
-                </h2>
-                <p className="mt-2 text-gray-600">
-                  Fungua akaunti yako ya bure leo
-                </p>
-              </>
-            )}
+            <h2 className="text-3xl font-bold text-gray-900">
+              Kuwa Mwenye Nyumba
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Jisajili na uanze kutangaza nyumba zako leo
+            </p>
           </div>
 
           {/* Sign up form */}
@@ -160,29 +148,6 @@ const SignUp = () => {
                     required
                     className="mt-1"
                   />
-                </div>
-
-                <div>
-                  <Label htmlFor="userType">Aina ya Mtumiaji</Label>
-                  <Select value={formData.userType} onValueChange={(value) => handleInputChange('userType', value)}>
-                    <SelectTrigger className="mt-1">
-                      <SelectValue placeholder={
-                        searchParams.get('type') === 'landlord' 
-                          ? "Mwenye nyumba/Mpangisha" 
-                          : "Chagua aina ya mtumiaji"
-                      } />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tenant">Mtu anayetafuta nyumba</SelectItem>
-                      <SelectItem value="landlord">Mwenye nyumba/Mpangisha</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {searchParams.get('type') === 'landlord' && (
-                    <p className="text-sm text-green-600 mt-1 flex items-center">
-                      <Check className="h-4 w-4 mr-1" />
-                      Umechagua kuwa mwenye nyumba
-                    </p>
-                  )}
                 </div>
 
                 <div>
@@ -269,9 +234,7 @@ const SignUp = () => {
                   className="w-full bg-primary hover:bg-primary/90"
                   disabled={!formData.agreeToTerms || isLoading}
                 >
-                  {isLoading ? 'Inasubiri...' : (
-                    searchParams.get('type') === 'landlord' ? 'Jisajili kama Mwenye Nyumba' : 'Jisajili'
-                  )}
+                  {isLoading ? 'Inasubiri...' : 'Jisajili kama Mwenye Nyumba'}
                 </Button>
               </form>
 
@@ -287,30 +250,18 @@ const SignUp = () => {
           </Card>
 
           {/* Benefits */}
-          <div className={`rounded-lg p-4 ${
-            searchParams.get('type') === 'landlord' ? 'bg-blue-50' : 'bg-green-50'
-          }`}>
-            <h3 className="font-semibold text-green-900 mb-3 flex items-center">
+          <div className="bg-blue-50 rounded-lg p-4">
+            <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
               <Check className="h-4 w-4 mr-2" />
-              {searchParams.get('type') === 'landlord' ? 'Faida za kuwa mwenye nyumba:' : 'Faida za kujisajili:'}
+              Faida za kuwa mwenye nyumba:
             </h3>
-            {searchParams.get('type') === 'landlord' ? (
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Tangaza nyumba zako kwa bure</li>
-                <li>• Pata wapangaji wa haraka</li>
-                <li>• Simamia matangazo yako kwa urahisi</li>
-                <li>• Wasiliana na wapangaji moja kwa moja</li>
-                <li>• Pata takwimu za matangazo yako</li>
-              </ul>
-            ) : (
-              <ul className="text-sm text-green-800 space-y-1">
-                <li>• Okoa nyumba unazozipenda</li>
-                <li>• Pata arifa za nyumba mpya</li>
-                <li>• Wasiliana na wenye nyumba</li>
-                <li>• Weka tangazo la nyumba yako</li>
-                <li>• Pata msaada wa haraka</li>
-              </ul>
-            )}
+            <ul className="text-sm text-blue-800 space-y-1">
+              <li>• Tangaza nyumba zako kwa bure</li>
+              <li>• Pata wapangaji wa haraka</li>
+              <li>• Simamia matangazo yako kwa urahisi</li>
+              <li>• Wasiliana na wapangaji moja kwa moja</li>
+              <li>• Pata takwimu za matangazo yako</li>
+            </ul>
           </div>
         </div>
       </div>

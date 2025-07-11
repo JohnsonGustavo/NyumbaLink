@@ -473,18 +473,14 @@ const Dashboard = () => {
 
                       <div>
                         <Label htmlFor="user_type">Aina ya Mtumiaji</Label>
-                        <Select 
-                          value={profileForm.user_type} 
-                          onValueChange={(value) => handleProfileInputChange('user_type', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="landlord">Mwenye Nyumba/Mpangisha</SelectItem>
-                            <SelectItem value="tenant">Mtu anayetafuta nyumba</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Input
+                          value="Mwenye Nyumba/Mpangisha"
+                          disabled
+                          className="bg-gray-50 text-gray-600"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Aina ya akaunti haiwezi kubadilishwa
+                        </p>
                       </div>
 
                       <div className="flex justify-end space-x-2 pt-4">
