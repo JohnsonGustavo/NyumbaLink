@@ -107,7 +107,7 @@ const FeaturesSection = () => {
                 to="/signup" 
                 className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors inline-block text-center"
               >
-               Jisajili Kama Mwenye Nyumba
+                Jisajili Kama Mwenye Nyumba
               </Link>
               <Link 
                 to="/browse" 

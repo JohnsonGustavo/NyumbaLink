@@ -239,7 +239,7 @@ const Navigation = () => {
               )}
               
               <Link
-                to={user ? "/dashboard" : "/signup?type=landlord"}
+                to={user ? "/dashboard" : "/signup"}
                 className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
