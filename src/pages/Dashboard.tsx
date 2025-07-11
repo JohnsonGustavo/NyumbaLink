@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import ImageUpload from '@/components/ImageUpload';
@@ -10,6 +9,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
 import { 
   Plus, 
   Edit2, 
@@ -21,7 +23,13 @@ import {
   DollarSign,
   Upload,
   X,
-  Save
+  Save,
+  User,
+  Phone,
+  Mail,
+  Settings,
+  Camera,
+  CheckCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -30,6 +38,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Property = Tables<'properties'>;
+type Profile = Tables<'profiles'>;
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -38,6 +47,16 @@ const Dashboard = () => {
   const [editingProperty, setEditingProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
+  const [profileLoading, setProfileLoading] = useState(false);
+  
+  // Profile state
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profileForm, setProfileForm] = useState({
+    full_name: '',
+    phone: '',
+    user_type: 'landlord'
+  });
   
   const [formData, setFormData] = useState({
     title: '',
@@ -60,12 +79,43 @@ const Dashboard = () => {
 
   const [properties, setProperties] = useState<Property[]>([]);
 
-  // Fetch properties on component mount
+  // Fetch profile and properties on component mount
   useEffect(() => {
     if (user) {
+      fetchProfile();
       fetchProperties();
     }
   }, [user]);
+
+  const fetchProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
+        throw error;
+      }
+
+      if (data) {
+        setProfile(data);
+        setProfileForm({
+          full_name: data.full_name || '',
+          phone: data.phone || '',
+          user_type: data.user_type || 'landlord'
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      toast({
+        variant: "destructive",
+        title: "Hitilafu",
+        description: "Imeshindikana kupata maelezo ya akaunti yako"
+      });
+    }
+  };
 
   const fetchProperties = async () => {
     try {
@@ -90,8 +140,51 @@ const Dashboard = () => {
     }
   };
 
+  const handleProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+
+    try {
+      setProfileLoading(true);
+      
+      const profileData = {
+        user_id: user.id,
+        full_name: profileForm.full_name,
+        phone: profileForm.phone,
+        user_type: profileForm.user_type
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .upsert(profileData, { onConflict: 'user_id' });
+
+      if (error) throw error;
+
+      toast({
+        title: "Umefanikiwa!",
+        description: "Maelezo ya akaunti yako yamebadilishwa kikamilifu"
+      });
+
+      setShowProfileDialog(false);
+      fetchProfile(); // Refresh profile data
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast({
+        variant: "destructive",
+        title: "Hitilafu",
+        description: "Imeshindikana kubadilisha maelezo ya akaunti yako"
+      });
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleProfileInputChange = (field: string, value: string) => {
+    setProfileForm(prev => ({ ...prev, [field]: value }));
   };
 
   const handleServiceToggle = (service: string) => {
@@ -154,7 +247,6 @@ const Dashboard = () => {
       };
 
       if (editingProperty) {
-        // Update existing property
         const { error } = await supabase
           .from('properties')
           .update(propertyData)
@@ -167,7 +259,6 @@ const Dashboard = () => {
           description: "Nyumba yako imesasishwa kikamilifu"
         });
       } else {
-        // Create new property
         const { error } = await supabase
           .from('properties')
           .insert([propertyData]);
@@ -272,9 +363,9 @@ const Dashboard = () => {
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
+        {/* Header with Profile Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-6">
+          <div className="flex-1">
             <h1 className="text-3xl font-bold text-gray-900">
               Dashibodi ya Mwenye Nyumba
             </h1>
@@ -282,9 +373,162 @@ const Dashboard = () => {
               Simamia nyumba zako na angalia takwimu
             </p>
           </div>
-          <Button onClick={() => setShowAddForm(true)} className="bg-primary hover:bg-primary/90">
+
+          {/* Profile Card */}
+          <Card className="w-full lg:w-auto lg:min-w-[300px]">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-12 w-12">
+                  <AvatarImage src="" />
+                  <AvatarFallback className="bg-primary text-white">
+                    {profile?.full_name ? profile.full_name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 truncate">
+                    {profile?.full_name || 'Jina halijawekwa'}
+                  </h3>
+                  <p className="text-sm text-gray-600 truncate">
+                    {user?.email}
+                  </p>
+                  {profile?.phone && (
+                    <p className="text-sm text-gray-600 truncate">
+                      📞 {profile.phone}
+                    </p>
+                  )}
+                </div>
+                <Dialog open={showProfileDialog} onOpenChange={setShowProfileDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="flex-shrink-0">
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-2">
+                        <User className="h-5 w-5" />
+                        Sasisha Maelezo ya Akaunti
+                      </DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleProfileSubmit} className="space-y-4">
+                      <div>
+                        <Label htmlFor="full_name">Jina Kamili</Label>
+                        <Input
+                          id="full_name"
+                          value={profileForm.full_name}
+                          onChange={(e) => handleProfileInputChange('full_name', e.target.value)}
+                          placeholder="Weka jina lako kamili"
+                          required
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="phone">Nambari ya Simu</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          value={profileForm.phone}
+                          onChange={(e) => handleProfileInputChange('phone', e.target.value)}
+                          placeholder="+255712345678"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="user_type">Aina ya Mtumiaji</Label>
+                        <Select 
+                          value={profileForm.user_type} 
+                          onValueChange={(value) => handleProfileInputChange('user_type', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="landlord">Mwenye Nyumba/Mpangisha</SelectItem>
+                            <SelectItem value="tenant">Mtu anayetafuta nyumba</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex justify-end space-x-2 pt-4">
+                        <Button 
+                          type="button" 
+                          variant="outline"
+                          onClick={() => setShowProfileDialog(false)}
+                          disabled={profileLoading}
+                        >
+                          Sitisha
+                        </Button>
+                        <Button 
+                          type="submit" 
+                          disabled={profileLoading}
+                          className="bg-primary hover:bg-primary/90"
+                        >
+                          {profileLoading ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                              Inahifadhi...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 mr-2" />
+                              Hifadhi
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              {/* Profile completion status */}
+              <div className="mt-3 pt-3 border-t">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Akaunti imekamilika:</span>
+                  <div className="flex items-center">
+                    {profile?.full_name && profile?.phone ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
+                        <span className="text-green-600 font-medium">100%</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="h-4 w-4 rounded-full border-2 border-orange-500 mr-1"></div>
+                        <span className="text-orange-600 font-medium">
+                          {profile?.full_name || profile?.phone ? '50%' : '0%'}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {(!profile?.full_name || !profile?.phone) && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    Kamilisha maelezo yako ili kupata huduma bora zaidi
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+          <Button 
+            onClick={() => setShowAddForm(true)} 
+            className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none"
+          >
             <Plus className="h-4 w-4 mr-2" />
             Ongeza Nyumba Mpya
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            onClick={() => setShowProfileDialog(true)}
+            className="flex-1 sm:flex-none"
+          >
+            <User className="h-4 w-4 mr-2" />
+            Sasisha Akaunti
           </Button>
         </div>
 
