@@ -253,13 +253,13 @@ const SignUp = () => {
           <div className="bg-blue-50 rounded-lg p-4">
             <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
               <Check className="h-4 w-4 mr-2" />
-              Faida za kuwa mwenye nyumba:
+              {isFromHomepage ? 'Faida za kuwa mpangisha:' : 'Faida za kuwa mwenye nyumba:'}
             </h3>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• Tangaza nyumba zako kwa bure</li>
-              <li>• Pata wapangaji wa haraka</li>
+              <li>• {isFromHomepage ? 'Pata wateja wa haraka' : 'Pata wapangaji wa haraka'}</li>
               <li>• Simamia matangazo yako kwa urahisi</li>
-              <li>• Wasiliana na wapangaji moja kwa moja</li>
+              <li>• {isFromHomepage ? 'Wasiliana na wateja moja kwa moja' : 'Wasiliana na wapangaji moja kwa moja'}</li>
               <li>• Pata takwimu za matangazo yako</li>
             </ul>
           </div>
