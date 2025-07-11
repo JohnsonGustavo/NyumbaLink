@@ -104,7 +104,7 @@ const FeaturesSection = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
-                to="/signup?from=homepage" 
+                to="/signup" 
                 className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors inline-block text-center"
               >
                 Jisajili Kama Mpangisha
