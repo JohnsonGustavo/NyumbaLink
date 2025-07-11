@@ -10,9 +10,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Eye, EyeOff, Home, Check } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 const SignUp = () => {
   const [searchParams] = useSearchParams();
+  const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,12 +42,20 @@ const SignUp = () => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      alert('Nywila hazifanani');
+      toast({
+        variant: "destructive",
+        title: "Hitilafu",
+        description: "Nywila hazifanani"
+      });
       return;
     }
 
     if (!formData.agreeToTerms) {
-      alert('Unalazimika kukubali masharti na taratibu');
+      toast({
+        variant: "destructive",
+        title: "Hitilafu", 
+        description: "Unalazimika kukubali masharti na taratibu"
+      });
       return;
     }
 
@@ -58,13 +68,11 @@ const SignUp = () => {
     });
 
     if (!error) {
-      // Navigate landlords to dashboard, tenants stay on current page
-      if (formData.userType === 'landlord') {
-        // Small delay to ensure profile is created
-        setTimeout(() => {
-          navigate('/dashboard', { replace: true });
-        }, 1000);
-      }
+      // All users are landlords, so always redirect to dashboard
+      // Small delay to ensure profile is created
+      setTimeout(() => {
+        navigate('/dashboard', { replace: true });
+      }, 1000);
       
       setFormData({
         fullName: '',
@@ -72,7 +80,7 @@ const SignUp = () => {
         phone: '',
         password: '',
         confirmPassword: '',
-        userType: '',
+        userType: 'landlord',
         agreeToTerms: false
       });
     }

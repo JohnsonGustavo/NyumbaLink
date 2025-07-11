@@ -41,13 +41,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, metadata: any) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl,
         data: metadata
       }
     });
@@ -61,9 +58,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } else {
       toast({
         title: "Umefanikiwa kujisajili!",
-        description: metadata.user_type === 'landlord' 
-          ? "Karibu kwenye Nyumba Link! Unaweza kuanza kuongeza nyumba zako sasa."
-          : "Tafadhali kagua barua pepe yako ili kuthibitisha akaunti yako."
+        description: "Karibu kwenye Nyumba Link! Unaweza kuanza kuongeza nyumba zako sasa."
       });
     }
 
