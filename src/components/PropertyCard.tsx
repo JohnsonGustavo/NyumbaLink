@@ -191,7 +191,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               {/* WhatsApp Contact Button */}
               {phone && (
                 <a
-                  href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+                  href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=Hujambo,%20ninapenda%20kujua%20zaidi%20kuhusu%20nyumba%20hii:%20${encodeURIComponent(title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

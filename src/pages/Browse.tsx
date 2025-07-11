@@ -41,6 +41,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import LoadingSpinner from '@/components/ui/loading-spinner';
 import { Search, Filter, MapPin, SlidersHorizontal, X, Grid3X3, List, Loader2 } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useProperties } from '@/hooks/useProperties';
@@ -462,9 +463,9 @@ const Browse = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center items-center py-16">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-2 text-gray-600">Inapakia nyumba...</span>
+          <div className="py-16">
+            <LoadingSpinner size="lg" className="mb-4" />
+            <p className="text-center text-gray-600">Inapakia nyumba...</p>
           </div>
         )}
 
