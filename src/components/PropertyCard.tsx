@@ -180,7 +180,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
              * 
              * Fixed-width image container for list view.
              * Maintains aspect ratio and provides hover effects.
-             */
+             */}
             <div className="w-80 h-60 flex-shrink-0 relative overflow-hidden">
               <img
                 src={images[0] || `https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop`}
@@ -194,7 +194,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                * 
                * Positioned absolutely in top-right corner.
                * Changes color based on favorite status.
-               */
+               */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -212,7 +212,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                * 
                * Displays price prominently on image.
                * High contrast for readability.
-               */
+               */}
               <div className="absolute bottom-3 left-3">
                 <Badge className="bg-white text-gray-900 font-bold text-base px-3 py-1 shadow-sm">
                   TZS {price.toLocaleString()}/mwezi
@@ -226,7 +226,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
              * 
              * Expanded content area with detailed information.
              * Includes title, location, rating, and contact button.
-             */
+             */}
             <div className="flex-1 p-6">
               <div className="space-y-3">
                 <div>
@@ -245,7 +245,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                  * 
                  * Shows property rating and provides contact options.
                  * WhatsApp integration for direct communication.
-                 */
+                 */}
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex items-center">
                     <Star className="h-4 w-4 text-yellow-400 fill-current" />
@@ -259,7 +259,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                    * 
                    * Direct WhatsApp integration for instant communication.
                    * Opens WhatsApp with pre-filled message.
-                   */
+                   */}
                   {phone && (
                     <a
                       href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
@@ -310,7 +310,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
            * 
            * Square aspect ratio image with carousel functionality.
            * Includes navigation and indicators for multiple images.
-           */
+           */}
           <div className="aspect-[4/3] overflow-hidden relative">
             <img
               src={images[currentImageIndex] || `https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=400&h=300&fit=crop`}
@@ -325,7 +325,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
            * 
            * Shows dots for each image and allows navigation.
            * Only displayed when multiple images are available.
-           */
+           */}
           {images.length > 1 && (
             <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex space-x-1">
               {images.map((_, index) => (
@@ -350,7 +350,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
            * 
            * Heart icon for adding/removing from favorites.
            * Visual feedback based on current state.
-           */
+           */}
           <Button
             variant="ghost"
             size="sm"
@@ -369,7 +369,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
          * 
          * Compact content area with essential information.
          * Optimized for quick scanning and comparison.
-         */
+         */}
         <CardContent className="p-4">
           <div className="space-y-2">
             {/* 
@@ -378,7 +378,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
              * 
              * Property name and location with truncation.
              * Hover effects for better interactivity.
-             */
+             */}
             <div>
               <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-primary transition-colors">
                 {title}
@@ -394,7 +394,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
              * 
              * Shows property rating with star icon.
              * Includes review count for credibility.
-             */
+             */}
             <div className="flex items-center">
               <Star className="h-4 w-4 text-yellow-400 fill-current" />
               <span className="text-sm font-medium text-gray-900 ml-1">4.8</span>
@@ -407,7 +407,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
              * 
              * Displays price and contact button side by side.
              * WhatsApp integration for instant communication.
-             */
+             */}
             <div className="pt-1 flex items-center justify-between">
               <div className="flex items-baseline">
                 <span className="text-lg font-bold text-gray-900">
@@ -422,7 +422,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                * 
                * Compact contact button with WhatsApp integration.
                * Pre-filled message for better user experience.
-               */
+               */}
               {phone && (
                 <a
                   href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=Hujambo,%20ninapenda%20kujua%20zaidi%20kuhusu%20nyumba%20hii:%20${encodeURIComponent(title)}`}
