@@ -133,7 +133,7 @@ const Navigation = () => {
             </Link>
             
             {/* Host Dashboard Link - Kiungo cha dashibodi ya mwenye nyumba */}
-            <Link to="/dashboard">
+            <Link to={user ? "/dashboard" : "/signup?type=landlord"}>
               <Button
                 variant="ghost"
                 className={`px-4 py-2 rounded-full hover:bg-gray-100 ${
@@ -239,7 +239,7 @@ const Navigation = () => {
               )}
               
               <Link
-                to="/dashboard"
+                to={user ? "/dashboard" : "/signup?type=landlord"}
                 className="block px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
