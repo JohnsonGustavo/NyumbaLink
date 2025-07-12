@@ -23,55 +23,9 @@
  * - Sorting options (price, date, etc.) (Chaguo za kupanga)
  * - Grid and list view modes (Hali za kuona kama gridi na orodha)
  * - Favorites management (Usimamizi wa vipendwa)
- * 
- * PERFORMANCE CONSIDERATIONS / MAMBO YA UTENDAJI:
- * - Efficient filtering algorithms for large datasets
- * - Memoized filter functions (can be optimized)
- * - Lazy loading for images
- * - Virtual scrolling for large lists (future enhancement)
- * - Debounced search input (can be added)
- * 
- * DATA FLOW / MTIRIRIKO WA DATA:
- * 1. Receives URL parameters from HeroSection or PopularDestinations
- * 2. Filters properties based on search criteria
- * 3. Displays filtered results with pagination
- * 4. Allows users to save favorites and navigate to property details
- * 
- * STATE MANAGEMENT STRATEGY / MKAKATI WA USIMAMIZI WA HALI:
- * - URL parameters for shareable state
- * - Local state for UI interactions
- * - React Query for server state
- * - Context for global favorites (can be added)
- * 
- * COMPONENT INTERACTIONS / MWINGILIANO WA VIPENGELE:
- * - Receives search params from: HeroSection, PopularDestinations
- * - Navigates to: PropertyDetail page
- * - Uses: PropertyCard component for display
- * - Manages: Favorites state across the application
- * 
- * ACCESSIBILITY FEATURES / VIPENGELE VYA UFIKIVU:
- * - Keyboard navigation support
- * - Screen reader friendly labels
- * - High contrast design
- * - Focus management
- * - ARIA labels for complex interactions
- * 
- * FILTERING LOGIC / MANTIKI YA KUCHUJA:
- * - Location: Partial matching for city names and areas
- * - Price: Range filtering with min/max values
- * - Utilities: Multiple selection (electricity, water)
- * - Services: Multiple selection (schools, hospitals, markets)
- * - Sorting: By price, date, relevance
- * 
- * SCALABILITY ENHANCEMENTS / MABORESHO YA UKUAJI:
- * - Can be extended with saved searches
- * - Map view integration ready
- * - Advanced filters (property type, size, etc.)
- * - Recommendation engine integration
- * - Social features (sharing, reviews)
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import PropertyCard from '@/components/PropertyCard';
 import Footer from '@/components/Footer';
@@ -81,65 +35,104 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import LoadingSpinner from '@/components/ui/loading-spinner';
-import { Search, Filter, MapPin, SlidersHorizontal, X, Grid3X3, List, Loader2 } from 'lucide-react';
+import { Search, MapPin, SlidersHorizontal, X, Grid3X3, List } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useProperties } from '@/hooks/useProperties';
+import type { Property } from '@/hooks/useProperties';
 
 /**
- * Browse Properties Component
- * Kipengele cha kutazama nyumba
+ * FILTER STATE INTERFACE
+ * ======================
  * 
- * This component handles the main property browsing experience with advanced filtering,
- * search capabilities, and multiple view modes for user convenience.
- * 
- * Kipengele hiki kinashughulikia tajriba ya kutazama nyumba na vichujio vya kirefu,
- * uwezo wa kutafuta, na hali nyingi za kuona kwa urahisi wa mtumiaji.
+ * Defines the structure for all filter-related state.
+ * Centralizes filter management for better maintainability.
  */
-const Browse = () => {
-  // URL parameter handling for search state persistence
-  // Kushughulikia vigezo vya URL kwa kudumu kwa hali ya utafutaji
-  const [searchParams] = useSearchParams();
-  
-  // Search and filter state management
-  // Usimamizi wa hali ya utafutaji na vichujio
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('location') || ''); // Location search
-  const [priceRange, setPriceRange] = useState(searchParams.get('price') || 'all'); // Predefined price ranges
-  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || ''); // Custom minimum price
-  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || ''); // Custom maximum price
-  const [utilities, setUtilities] = useState<string[]>([]); // Utilities filter (electricity, water)
-  const [nearbyServices, setNearbyServices] = useState<string[]>([]); // Services filter (schools, hospitals)
-  const [sortBy, setSortBy] = useState('newest'); // Sorting preference
-  const [showFilters, setShowFilters] = useState(false); // Filter panel visibility
-  const [favoriteIds, setFavoriteIds] = useState<string[]>([]); // User's favorite properties
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // Display mode preference
+interface FilterState {
+  searchQuery: string;
+  priceRange: string;
+  minPrice: string;
+  maxPrice: string;
+  utilities: string[];
+  nearbyServices: string[];
+  sortBy: string;
+}
 
-  // Fetch properties from Supabase
-  const { data: properties = [], isLoading, error } = useProperties();
+/**
+ * UI STATE INTERFACE
+ * ==================
+ * 
+ * Defines the structure for UI-related state.
+ * Separates UI state from business logic.
+ */
+interface UIState {
+  showFilters: boolean;
+  favoriteIds: string[];
+  viewMode: 'grid' | 'list';
+}
 
-  // Filter properties based on search criteria
-  const filteredProperties = properties.filter(property => {
-    // Location filtering - show properties from specific city
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase().trim();
+/**
+ * INITIAL FILTER STATE
+ * ====================
+ * 
+ * Default values for all filters.
+ * Extracted for reusability and consistency.
+ */
+const getInitialFilterState = (searchParams: URLSearchParams): FilterState => ({
+  searchQuery: searchParams.get('location') || '',
+  priceRange: searchParams.get('price') || 'all',
+  minPrice: searchParams.get('minPrice') || '',
+  maxPrice: searchParams.get('maxPrice') || '',
+  utilities: [],
+  nearbyServices: [],
+  sortBy: 'newest'
+});
+
+/**
+ * INITIAL UI STATE
+ * ================
+ * 
+ * Default values for UI-related state.
+ */
+const getInitialUIState = (): UIState => ({
+  showFilters: false,
+  favoriteIds: [],
+  viewMode: 'grid'
+});
+
+/**
+ * PROPERTY FILTERING LOGIC
+ * ========================
+ * 
+ * Pure function that filters properties based on current filter state.
+ * Separated for testability and reusability.
+ * 
+ * @param properties - Array of properties to filter
+ * @param filters - Current filter state
+ * @returns Filtered array of properties
+ */
+const filterProperties = (properties: Property[], filters: FilterState): Property[] => {
+  return properties.filter(property => {
+    // Location filtering - case insensitive partial match
+    if (filters.searchQuery) {
+      const query = filters.searchQuery.toLowerCase().trim();
       const location = property.location.toLowerCase();
       
-      // Direct match for the location
       if (!location.includes(query)) {
         return false;
       }
     }
 
-    // Handle custom price inputs
-    if (minPrice && parseInt(minPrice) > Number(property.price)) {
+    // Custom price range filtering
+    if (filters.minPrice && parseInt(filters.minPrice) > Number(property.price)) {
       return false;
     }
-    if (maxPrice && parseInt(maxPrice) < Number(property.price)) {
+    if (filters.maxPrice && parseInt(filters.maxPrice) < Number(property.price)) {
       return false;
     }
 
-    // Handle predefined price range
-    if (priceRange && priceRange !== 'all') {
-      const [min, max] = priceRange.split('-').map(p => p.replace('+', ''));
+    // Predefined price range filtering
+    if (filters.priceRange && filters.priceRange !== 'all') {
+      const [min, max] = filters.priceRange.split('-').map(p => p.replace('+', ''));
       const minPriceRange = parseInt(min);
       const maxPriceRange = max ? parseInt(max) : Infinity;
       
@@ -148,13 +141,15 @@ const Browse = () => {
       }
     }
 
-    if (utilities.length > 0) {
-      if (utilities.includes('electricity') && !property.electricity) return false;
-      if (utilities.includes('water') && !property.water) return false;
+    // Utilities filtering
+    if (filters.utilities.length > 0) {
+      if (filters.utilities.includes('electricity') && !property.electricity) return false;
+      if (filters.utilities.includes('water') && !property.water) return false;
     }
 
-    if (nearbyServices.length > 0) {
-      const hasAllServices = nearbyServices.every(service => 
+    // Nearby services filtering
+    if (filters.nearbyServices.length > 0) {
+      const hasAllServices = filters.nearbyServices.every(service => 
         property.nearby_services?.includes(service)
       );
       if (!hasAllServices) return false;
@@ -162,9 +157,21 @@ const Browse = () => {
 
     return true;
   });
+};
 
-  // Sort properties
-  const sortedProperties = [...filteredProperties].sort((a, b) => {
+/**
+ * PROPERTY SORTING LOGIC
+ * ======================
+ * 
+ * Pure function that sorts properties based on sort criteria.
+ * Separated for clarity and reusability.
+ * 
+ * @param properties - Array of properties to sort
+ * @param sortBy - Sort criteria
+ * @returns Sorted array of properties
+ */
+const sortProperties = (properties: Property[], sortBy: string): Property[] => {
+  return [...properties].sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
         return Number(a.price) - Number(b.price);
@@ -175,25 +182,149 @@ const Browse = () => {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     }
   });
+};
 
-  const handleToggleFavorite = (propertyId: string) => {
-    setFavoriteIds(prev => 
-      prev.includes(propertyId)
-        ? prev.filter(id => id !== propertyId)
-        : [...prev, propertyId]
+/**
+ * FILTER UTILITIES
+ * ================
+ * 
+ * Helper functions for filter management.
+ */
+const FilterUtils = {
+  /**
+   * Clears all filters to their default state
+   */
+  clearAll: (): FilterState => ({
+    searchQuery: '',
+    priceRange: 'all',
+    minPrice: '',
+    maxPrice: '',
+    utilities: [],
+    nearbyServices: [],
+    sortBy: 'newest'
+  }),
+
+  /**
+   * Checks if any filters are currently active
+   */
+  hasActiveFilters: (filters: FilterState): boolean => {
+    return !!(
+      filters.searchQuery ||
+      (filters.priceRange && filters.priceRange !== 'all') ||
+      filters.minPrice ||
+      filters.maxPrice ||
+      filters.utilities.length > 0 ||
+      filters.nearbyServices.length > 0
     );
+  },
+
+  /**
+   * Toggles a utility filter on/off
+   */
+  toggleUtility: (utilities: string[], utility: string): string[] => {
+    return utilities.includes(utility)
+      ? utilities.filter(u => u !== utility)
+      : [...utilities, utility];
+  },
+
+  /**
+   * Toggles a nearby service filter on/off
+   */
+  toggleNearbyService: (services: string[], service: string): string[] => {
+    return services.includes(service)
+      ? services.filter(s => s !== service)
+      : [...services, service];
+  }
+};
+
+/**
+ * BROWSE COMPONENT
+ * ===============
+ * 
+ * Main component for property browsing and search functionality.
+ * Handles all filtering, sorting, and display logic.
+ */
+const Browse = () => {
+  // URL parameter handling for search state persistence
+  const [searchParams] = useSearchParams();
+  
+  // State management - separated into logical groups
+  const [filters, setFilters] = useState<FilterState>(() => getInitialFilterState(searchParams));
+  const [uiState, setUIState] = useState<UIState>(() => getInitialUIState());
+  
+  // Data fetching from Supabase
+  const { data: properties = [], isLoading, error } = useProperties();
+
+  /**
+   * FILTER UPDATE HANDLERS
+   * =====================
+   * 
+   * Centralized handlers for updating different types of filters.
+   */
+  const updateFilter = <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
   };
 
-  const clearAllFilters = () => {
-    setSearchQuery('');
-    setPriceRange('all');
-    setMinPrice('');
-    setMaxPrice('');
-    setUtilities([]);
-    setNearbyServices([]);
-    setSortBy('newest');
+  const updateUIState = <K extends keyof UIState>(key: K, value: UIState[K]) => {
+    setUIState(prev => ({ ...prev, [key]: value }));
   };
 
+  /**
+   * UTILITY TOGGLE HANDLER
+   * =====================
+   * 
+   * Handles toggling of utility filters (electricity, water).
+   */
+  const handleUtilityToggle = (utility: string) => {
+    const newUtilities = FilterUtils.toggleUtility(filters.utilities, utility);
+    updateFilter('utilities', newUtilities);
+  };
+
+  /**
+   * NEARBY SERVICE TOGGLE HANDLER
+   * ============================
+   * 
+   * Handles toggling of nearby service filters (school, hospital, market).
+   */
+  const handleNearbyServiceToggle = (service: string) => {
+    const newServices = FilterUtils.toggleNearbyService(filters.nearbyServices, service);
+    updateFilter('nearbyServices', newServices);
+  };
+
+  /**
+   * FAVORITE TOGGLE HANDLER
+   * ======================
+   * 
+   * Manages adding/removing properties from favorites list.
+   */
+  const handleToggleFavorite = (propertyId: string) => {
+    const newFavorites = uiState.favoriteIds.includes(propertyId)
+      ? uiState.favoriteIds.filter(id => id !== propertyId)
+      : [...uiState.favoriteIds, propertyId];
+    
+    updateUIState('favoriteIds', newFavorites);
+  };
+
+  /**
+   * CLEAR ALL FILTERS HANDLER
+   * ========================
+   * 
+   * Resets all filters to their default state.
+   */
+  const handleClearAllFilters = () => {
+    setFilters(FilterUtils.clearAll());
+  };
+
+  // Apply filtering and sorting to properties
+  const filteredProperties = filterProperties(properties, filters);
+  const sortedProperties = sortProperties(filteredProperties, filters.sortBy);
+
+  /**
+   * ERROR STATE RENDERING
+   * ====================
+   * 
+   * Displays error message if data fetching fails.
+   */
   if (error) {
     return (
       <div className="min-h-screen bg-white">
@@ -216,6 +347,12 @@ const Browse = () => {
     );
   }
 
+  /**
+   * MAIN COMPONENT RENDERING
+   * =======================
+   * 
+   * Renders the complete browse page with all sections.
+   */
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
@@ -232,24 +369,26 @@ const Browse = () => {
             </p>
           </div>
 
-          {/* Main Search Bar */}
+          {/* Main Search Interface */}
           <Card className="shadow-lg border-0">
             <CardContent className="p-6">
               <div className="flex flex-col lg:flex-row gap-4">
+                {/* Location Search Input */}
                 <div className="flex-1">
                   <div className="relative">
                     <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <Input
                       placeholder="Mji au eneo la kupenda..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      value={filters.searchQuery}
+                      onChange={(e) => updateFilter('searchQuery', e.target.value)}
                       className="pl-12 h-14 text-lg border-0 focus-visible:ring-2 focus-visible:ring-primary"
                     />
                   </div>
                 </div>
 
+                {/* Price Range Selector */}
                 <div className="flex gap-4">
-                  <Select value={priceRange} onValueChange={setPriceRange}>
+                  <Select value={filters.priceRange} onValueChange={(value) => updateFilter('priceRange', value)}>
                     <SelectTrigger className="w-48 h-14 border-0">
                       <SelectValue placeholder="Bei (TZS)" />
                     </SelectTrigger>
@@ -263,15 +402,17 @@ const Browse = () => {
                     </SelectContent>
                   </Select>
 
+                  {/* Filter Toggle Button */}
                   <Button
                     variant="outline"
-                    onClick={() => setShowFilters(!showFilters)}
+                    onClick={() => updateUIState('showFilters', !uiState.showFilters)}
                     className="h-14 px-6 border-2"
                   >
                     <SlidersHorizontal className="h-5 w-5 mr-2" />
                     Filters
                   </Button>
 
+                  {/* Search Button */}
                   <Button className="h-14 px-8 bg-primary hover:bg-primary/90">
                     <Search className="h-5 w-5 mr-2" />
                     Tafuta
@@ -279,10 +420,11 @@ const Browse = () => {
                 </div>
               </div>
 
-              {/* Advanced Filters */}
-              {showFilters && (
+              {/* Advanced Filters Panel */}
+              {uiState.showFilters && (
                 <div className="border-t mt-6 pt-6">
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    {/* Custom Price Range */}
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Bei ya Maalum</h4>
                       <div className="space-y-3">
@@ -293,8 +435,8 @@ const Browse = () => {
                           <Input
                             type="number"
                             placeholder="30,000"
-                            value={minPrice}
-                            onChange={(e) => setMinPrice(e.target.value)}
+                            value={filters.minPrice}
+                            onChange={(e) => updateFilter('minPrice', e.target.value)}
                             className="w-full"
                           />
                         </div>
@@ -305,67 +447,61 @@ const Browse = () => {
                           <Input
                             type="number"
                             placeholder="500,000"
-                            value={maxPrice}
-                            onChange={(e) => setMaxPrice(e.target.value)}
+                            value={filters.maxPrice}
+                            onChange={(e) => updateFilter('maxPrice', e.target.value)}
                             className="w-full"
                           />
                         </div>
                       </div>
                     </div>
 
+                    {/* Utilities Filter */}
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Huduma za Msingi</h4>
                       <div className="space-y-3">
-                        {['electricity', 'water'].map((utility) => (
-                          <label key={utility} className="flex items-center">
+                        {[
+                          { key: 'electricity', label: 'Umeme' },
+                          { key: 'water', label: 'Maji' }
+                        ].map(({ key, label }) => (
+                          <label key={key} className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={utilities.includes(utility)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setUtilities([...utilities, utility]);
-                                } else {
-                                  setUtilities(utilities.filter(u => u !== utility));
-                                }
-                              }}
+                              checked={filters.utilities.includes(key)}
+                              onChange={() => handleUtilityToggle(key)}
                               className="mr-3 w-4 h-4 text-primary"
                             />
-                            <span className="text-gray-700">
-                              {utility === 'electricity' ? 'Umeme' : 'Maji'}
-                            </span>
+                            <span className="text-gray-700">{label}</span>
                           </label>
                         ))}
                       </div>
                     </div>
 
+                    {/* Nearby Services Filter */}
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Huduma za Karibu</h4>
                       <div className="space-y-3">
-                        {['school', 'hospital', 'market'].map((service) => (
-                          <label key={service} className="flex items-center">
+                        {[
+                          { key: 'school', label: 'Shule' },
+                          { key: 'hospital', label: 'Hospitali' },
+                          { key: 'market', label: 'Soko' }
+                        ].map(({ key, label }) => (
+                          <label key={key} className="flex items-center">
                             <input
                               type="checkbox"
-                              checked={nearbyServices.includes(service)}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  setNearbyServices([...nearbyServices, service]);
-                                } else {
-                                  setNearbyServices(nearbyServices.filter(s => s !== service));
-                                }
-                              }}
+                              checked={filters.nearbyServices.includes(key)}
+                              onChange={() => handleNearbyServiceToggle(key)}
                               className="mr-3 w-4 h-4 text-primary"
                             />
-                            <span className="text-gray-700">
-                              {service === 'school' ? 'Shule' : service === 'hospital' ? 'Hospitali' : 'Soko'}
-                            </span>
+                            <span className="text-gray-700">{label}</span>
                           </label>
                         ))}
                       </div>
                     </div>
 
+                    {/* Sort Options */}
                     <div>
                       <h4 className="font-semibold text-gray-900 mb-3">Panga Kwa</h4>
-                      <Select value={sortBy} onValueChange={setSortBy}>
+                      <Select value={filters.sortBy} onValueChange={(value) => updateFilter('sortBy', value)}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -378,8 +514,9 @@ const Browse = () => {
                     </div>
                   </div>
 
+                  {/* Clear Filters Button */}
                   <div className="flex justify-between items-center mt-6">
-                    <Button variant="ghost" onClick={clearAllFilters} className="text-gray-600">
+                    <Button variant="ghost" onClick={handleClearAllFilters} className="text-gray-600">
                       <X className="h-4 w-4 mr-2" />
                       Futa Filters Zote
                     </Button>
@@ -393,31 +530,32 @@ const Browse = () => {
 
       {/* Results Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Results Header */}
+        {/* Results Header with View Mode Toggle */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">
               {sortedProperties.length} nyumba zinapatikana
             </h2>
-            {searchQuery && (
-              <p className="text-gray-600 mt-1">katika "{searchQuery}"</p>
+            {filters.searchQuery && (
+              <p className="text-gray-600 mt-1">katika "{filters.searchQuery}"</p>
             )}
           </div>
 
+          {/* View Mode Toggle */}
           <div className="flex items-center gap-4">
             <div className="flex border rounded-lg">
               <Button
-                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                variant={uiState.viewMode === 'grid' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('grid')}
+                onClick={() => updateUIState('viewMode', 'grid')}
                 className="rounded-r-none"
               >
                 <Grid3X3 className="h-4 w-4" />
               </Button>
               <Button
-                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                variant={uiState.viewMode === 'list' ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('list')}
+                onClick={() => updateUIState('viewMode', 'list')}
                 className="rounded-l-none"
               >
                 <List className="h-4 w-4" />
@@ -426,70 +564,81 @@ const Browse = () => {
           </div>
         </div>
 
-        {/* Active Filters */}
-        {(searchQuery || (priceRange && priceRange !== 'all') || minPrice || maxPrice || utilities.length > 0 || nearbyServices.length > 0) && (
+        {/* Active Filters Display */}
+        {FilterUtils.hasActiveFilters(filters) && (
           <div className="mb-6">
             <div className="flex flex-wrap gap-2">
-              {searchQuery && (
+              {/* Search Query Badge */}
+              {filters.searchQuery && (
                 <Badge variant="secondary" className="px-3 py-1">
-                  {searchQuery}
+                  {filters.searchQuery}
                   <button
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => updateFilter('searchQuery', '')}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
                   </button>
                 </Badge>
               )}
-              {priceRange && priceRange !== 'all' && (
+              
+              {/* Price Range Badge */}
+              {filters.priceRange && filters.priceRange !== 'all' && (
                 <Badge variant="secondary" className="px-3 py-1">
-                  TZS {priceRange}
+                  TZS {filters.priceRange}
                   <button
-                    onClick={() => setPriceRange('all')}
+                    onClick={() => updateFilter('priceRange', 'all')}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
                   </button>
                 </Badge>
               )}
-              {minPrice && (
+              
+              {/* Min Price Badge */}
+              {filters.minPrice && (
                 <Badge variant="secondary" className="px-3 py-1">
-                  Min: TZS {parseInt(minPrice).toLocaleString()}
+                  Min: TZS {parseInt(filters.minPrice).toLocaleString()}
                   <button
-                    onClick={() => setMinPrice('')}
+                    onClick={() => updateFilter('minPrice', '')}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
                   </button>
                 </Badge>
               )}
-              {maxPrice && (
+              
+              {/* Max Price Badge */}
+              {filters.maxPrice && (
                 <Badge variant="secondary" className="px-3 py-1">
-                  Max: TZS {parseInt(maxPrice).toLocaleString()}
+                  Max: TZS {parseInt(filters.maxPrice).toLocaleString()}
                   <button
-                    onClick={() => setMaxPrice('')}
+                    onClick={() => updateFilter('maxPrice', '')}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
                   </button>
                 </Badge>
               )}
-              {utilities.map(utility => (
+              
+              {/* Utility Badges */}
+              {filters.utilities.map(utility => (
                 <Badge key={utility} variant="secondary" className="px-3 py-1">
                   {utility === 'electricity' ? 'Umeme' : 'Maji'}
                   <button
-                    onClick={() => setUtilities(utilities.filter(u => u !== utility))}
+                    onClick={() => handleUtilityToggle(utility)}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
                   </button>
                 </Badge>
               ))}
-              {nearbyServices.map(service => (
+              
+              {/* Nearby Service Badges */}
+              {filters.nearbyServices.map(service => (
                 <Badge key={service} variant="secondary" className="px-3 py-1">
                   {service === 'school' ? 'Shule' : service === 'hospital' ? 'Hospitali' : 'Soko'}
                   <button
-                    onClick={() => setNearbyServices(nearbyServices.filter(s => s !== service))}
+                    onClick={() => handleNearbyServiceToggle(service)}
                     className="ml-2 hover:text-red-500"
                   >
                     ×
@@ -508,10 +657,10 @@ const Browse = () => {
           </div>
         )}
 
-        {/* Properties Grid */}
+        {/* Properties Grid/List Display */}
         {!isLoading && sortedProperties.length > 0 ? (
           <div className={`grid gap-6 ${
-            viewMode === 'grid' 
+            uiState.viewMode === 'grid' 
               ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
               : 'grid-cols-1'
           }`}>
@@ -524,13 +673,14 @@ const Browse = () => {
                 location={property.location}
                 images={property.images || []}
                 phone={property.profiles?.phone || undefined}
-                isFavorited={favoriteIds.includes(property.id)}
+                isFavorited={uiState.favoriteIds.includes(property.id)}
                 onToggleFavorite={handleToggleFavorite}
-                viewMode={viewMode}
+                viewMode={uiState.viewMode}
               />
             ))}
           </div>
         ) : !isLoading ? (
+          /* Empty State */
           <div className="text-center py-16">
             <div className="max-w-md mx-auto">
               <Search className="h-16 w-16 text-gray-300 mx-auto mb-6" />
@@ -540,7 +690,7 @@ const Browse = () => {
               <p className="text-gray-600 mb-8">
                 Jaribu kubadilisha vigezo vya utafutaji au futa baadhi ya filters.
               </p>
-              <Button onClick={clearAllFilters} size="lg">
+              <Button onClick={handleClearAllFilters} size="lg">
                 Futa Filters Zote
               </Button>
             </div>
