@@ -205,34 +205,11 @@ const SignUp = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="agreeToTerms"
-                      type="checkbox"
-                      checked={formData.agreeToTerms}
-                      onChange={(e) => handleInputChange('agreeToTerms', e.target.checked)}
-                      className="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="agreeToTerms" className="text-gray-600">
-                      Nakubali{' '}
-                      <Link to="/terms" className="text-primary hover:underline">
-                        Masharti na Taratibu
-                      </Link>{' '}
-                      na{' '}
-                      <Link to="/privacy" className="text-primary hover:underline">
-                        Sera ya Faragha
-                      </Link>
-                    </label>
-                  </div>
-                </div>
 
                 <Button 
                   type="submit" 
                   className="w-full bg-primary hover:bg-primary/90"
-                  disabled={!formData.agreeToTerms || isLoading}
+                  disabled={isLoading}
                 >
                   {isLoading ? 'Inasubiri...' : 'Jisajili kama Mwenye Nyumba'}
                 </Button>
