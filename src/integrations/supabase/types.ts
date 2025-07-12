@@ -49,6 +49,8 @@ export type Database = {
           area_sqm: number | null
           bathrooms: number | null
           bedrooms: number | null
+          contact_phone: string | null
+          contact_whatsapp_phone: string | null
           created_at: string
           description: string | null
           electricity: boolean | null
@@ -73,6 +75,8 @@ export type Database = {
           area_sqm?: number | null
           bathrooms?: number | null
           bedrooms?: number | null
+          contact_phone?: string | null
+          contact_whatsapp_phone?: string | null
           created_at?: string
           description?: string | null
           electricity?: boolean | null
@@ -97,6 +101,8 @@ export type Database = {
           area_sqm?: number | null
           bathrooms?: number | null
           bedrooms?: number | null
+          contact_phone?: string | null
+          contact_whatsapp_phone?: string | null
           created_at?: string
           description?: string | null
           electricity?: boolean | null

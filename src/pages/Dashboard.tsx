@@ -90,6 +90,8 @@ const Dashboard = () => {
     bedrooms: '',
     bathrooms: '',
     area_sqm: '',
+    contact_phone: '',
+    contact_whatsapp_phone: '',
     electricity: false,
     water: false,
     furnished: false,
@@ -250,6 +252,8 @@ const Dashboard = () => {
         bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : null,
         bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : null,
         area_sqm: formData.area_sqm ? parseFloat(formData.area_sqm) : null,
+        contact_phone: formData.contact_phone || null,
+        contact_whatsapp_phone: formData.contact_whatsapp_phone || null,
         electricity: formData.electricity,
         water: formData.water,
         furnished: formData.furnished,
@@ -310,6 +314,8 @@ const Dashboard = () => {
       bedrooms: property.bedrooms?.toString() || '',
       bathrooms: property.bathrooms?.toString() || '',
       area_sqm: property.area_sqm?.toString() || '',
+      contact_phone: property.contact_phone || profile?.phone || '',
+      contact_whatsapp_phone: property.contact_whatsapp_phone || profile?.phone || '',
       electricity: property.electricity || false,
       water: property.water || false,
       furnished: property.furnished || false,
@@ -380,6 +386,8 @@ const Dashboard = () => {
       bedrooms: '',
       bathrooms: '',
       area_sqm: '',
+      contact_phone: profile?.phone || '',
+      contact_whatsapp_phone: profile?.phone || '',
       electricity: false,
       water: false,
       furnished: false,
@@ -717,6 +725,38 @@ const Dashboard = () => {
                           ))}
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Information */}
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="contact_phone">Nambari ya Simu ya Mawasiliano *</Label>
+                      <Input
+                        id="contact_phone"
+                        type="tel"
+                        value={formData.contact_phone}
+                        onChange={(e) => handleInputChange('contact_phone', e.target.value)}
+                        placeholder="+255712345678"
+                        required
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Nambari hii itaonekana kwa wapangaji wanaotaka kuwasiliana nawe
+                      </p>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="contact_whatsapp_phone">Nambari ya WhatsApp</Label>
+                      <Input
+                        id="contact_whatsapp_phone"
+                        type="tel"
+                        value={formData.contact_whatsapp_phone}
+                        onChange={(e) => handleInputChange('contact_whatsapp_phone', e.target.value)}
+                        placeholder="+255712345678"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Nambari ya WhatsApp kwa mawasiliano ya haraka (hiari)
+                      </p>
                     </div>
                   </div>
 
