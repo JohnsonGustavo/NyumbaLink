@@ -9,37 +9,37 @@ const PopularDestinations = () => {
       name: 'Dar es Salaam',
       properties: '120+ nyumba',
       image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop',
-      price: 'Kuanzia TSh 500,000'
+      price: 'Kuanzia TSh 30,000'
     },
     {
       name: 'Arusha',
       properties: '85+ nyumba',
       image: 'https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=400&h=300&fit=crop',
-      price: 'Kuanzia TSh 400,000'
+      price: 'Kuanzia TSh 40,000'
     },
     {
       name: 'Mwanza',
       properties: '60+ nyumba',
       image: 'https://images.unsplash.com/photo-1590736969955-71cc94901144?w=400&h=300&fit=crop',
-      price: 'Kuanzia TSh 350,000'
+      price: 'Kuanzia TSh 50,000'
     },
     {
       name: 'Dodoma',
       properties: '45+ nyumba',
       image: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=400&h=300&fit=crop',
-      price: 'Kuanzia TSh 300,000'
+      price: 'Kuanzia TSh 100,000'
     },
     {
       name: 'Zanzibar',
       properties: '30+ nyumba',
       image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400&h=300&fit=crop',
-      price: 'Kuanzia TSh 600,000'
+      price: 'Kuanzia TSh 200,000'
     },
     {
       name: 'Mbeya',
       properties: '25+ nyumba',
       image: 'https://images.unsplash.com/photo-1600298881974-6be191ceeda1?w=400&h=300&fit=crop',
-      price: 'Kuanzia TSh 250,000'
+      price: 'Kuanzia TSh 20,000'
     }
   ];
 
