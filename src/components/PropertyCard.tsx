@@ -260,9 +260,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                    * Direct WhatsApp integration for instant communication.
                    * Opens WhatsApp with pre-filled message.
                    */}
-                  {phone && (
+                  {(property.contact_whatsapp_phone || property.contact_phone) && (
                     <a
-                      href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+                      href={`https://wa.me/${(property.contact_whatsapp_phone || property.contact_phone)!.replace(/[^0-9]/g, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
@@ -423,9 +423,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                * Compact contact button with WhatsApp integration.
                * Pre-filled message for better user experience.
                */}
-              {phone && (
+              {(property.contact_whatsapp_phone || property.contact_phone) && (
                 <a
-                  href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=Hujambo,%20ninapenda%20kujua%20zaidi%20kuhusu%20nyumba%20hii:%20${encodeURIComponent(title)}`}
+                  href={`https://wa.me/${(property.contact_whatsapp_phone || property.contact_phone)!.replace(/[^0-9]/g, '')}?text=Hujambo,%20ninapenda%20kujua%20zaidi%20kuhusu%20nyumba%20hii:%20${encodeURIComponent(title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

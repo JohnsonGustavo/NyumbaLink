@@ -142,7 +142,7 @@ const FeaturedProperties = () => {
                       
                       {property.profiles?.phone && (
                         <a
-                          href={`https://wa.me/${property.profiles.phone.replace(/[^0-9]/g, '')}`}
+                          href={`https://wa.me/${(property.contact_whatsapp_phone || property.contact_phone || property.profiles.phone)!.replace(/[^0-9]/g, '')}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
