@@ -673,6 +673,8 @@ const Browse = () => {
                 location={property.location}
                 images={property.images || []}
                 phone={property.profiles?.phone || undefined}
+                contactPhone={property.contact_phone || undefined}
+                contactWhatsappPhone={property.contact_whatsapp_phone || undefined}
                 isFavorited={uiState.favoriteIds.includes(property.id)}
                 onToggleFavorite={handleToggleFavorite}
                 viewMode={uiState.viewMode}

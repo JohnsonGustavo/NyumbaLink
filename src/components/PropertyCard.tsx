@@ -74,6 +74,8 @@ interface PropertyCardProps {
   location: string;
   images: string[];
   phone?: string;
+  contactPhone?: string;
+  contactWhatsappPhone?: string;
   isFavorited?: boolean;
   onToggleFavorite?: (id: string) => void;
   viewMode?: 'grid' | 'list';
@@ -108,6 +110,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   location,
   images,
   phone,
+  contactPhone,
+  contactWhatsappPhone,
   isFavorited = false,
   onToggleFavorite,
   viewMode = 'grid'
@@ -260,9 +264,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                    * Direct WhatsApp integration for instant communication.
                    * Opens WhatsApp with pre-filled message.
                    */}
-                  {(property.contact_whatsapp_phone || property.contact_phone) && (
+                  {(contactWhatsappPhone || contactPhone) && (
                     <a
-                      href={`https://wa.me/${(property.contact_whatsapp_phone || property.contact_phone)!.replace(/[^0-9]/g, '')}`}
+                      href={`https://wa.me/${(contactWhatsappPhone || contactPhone || '').replace(/[^0-9]/g, '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
@@ -423,9 +427,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                * Compact contact button with WhatsApp integration.
                * Pre-filled message for better user experience.
                */}
-              {(property.contact_whatsapp_phone || property.contact_phone) && (
+              {(contactWhatsappPhone || contactPhone) && (
                 <a
-                  href={`https://wa.me/${(property.contact_whatsapp_phone || property.contact_phone)!.replace(/[^0-9]/g, '')}?text=Hujambo,%20ninapenda%20kujua%20zaidi%20kuhusu%20nyumba%20hii:%20${encodeURIComponent(title)}`}
+                  href={`https://wa.me/${(contactWhatsappPhone || contactPhone || '').replace(/[^0-9]/g, '')}?text=Hujambo,%20ninapenda%20kujua%20zaidi%20kuhusu%20nyumba%20hii:%20${encodeURIComponent(title)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
